@@ -1,8 +1,16 @@
 import LoginButton from './LoginButton'
+import LoginDemo from './LoginDemo'
+import LoginHeader from './LoginHeader'
+import Logo from './Logo'
 
 export default function LoginForm() {
   return (
-    <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div className="mt-5 p-8 sm:mx-auto sm:w-full sm:max-w-sm border border-gray-100 rounded-md shadow-[0_8px_48px_rgba(0,0,0,0.1)]">
+      {/* first part */}
+      <Logo />
+
+      <LoginHeader />
+
       <form action="#" method="POST" className="space-y-6">
         <div>
           <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
@@ -44,9 +52,7 @@ export default function LoginForm() {
       </form>
 
       {/* login demo line */}
-      <p className="mt-10 text-center text-sm/6 text-gray-500">
-        <span className="font-bold">Demo:</span> rahaf.hazem@pharaonx.com / PHx2026!
-      </p>
+      <LoginDemo />
     </div>
   )
 }
