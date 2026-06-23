@@ -48,7 +48,7 @@ export default function LoginForm() {
         </div>
 
         {/* button */}
-        <LoginButton />
+        <LoginButton>Sign In</LoginButton>
       </form>
 
       {/* login demo line */}
