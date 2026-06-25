@@ -2,8 +2,39 @@ import LoginButton from './LoginButton'
 import LoginDemo from './LoginDemo'
 import LoginHeader from './LoginHeader'
 import Logo from './Logo'
+import { useState } from 'react'
 
 export default function LoginForm() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  //use when redirecting
+  // const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState(null)
+  const [error, setError] = useState('')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+
+    // setLoading(true)
+    setError('')
+
+    try {
+      const result = await window.api.login(email, password)
+
+      if (!result.success) {
+        throw new Error(result.error || 'Login failed')
+      }
+
+      setUser(result.user)
+    } catch (err) {
+      setError(err.message)
+    }
+    //use when redirecting
+    /* finally {
+      setLoading(false)
+    } */
+  }
   return (
     <div className="mt-5 p-8 sm:mx-auto sm:w-full sm:max-w-sm border border-gray-100 rounded-md shadow-[0_8px_48px_rgba(0,0,0,0.1)]">
       {/* first part */}
@@ -11,7 +42,7 @@ export default function LoginForm() {
 
       <LoginHeader />
 
-      <form action="#" method="POST" className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
             Email address
@@ -24,6 +55,8 @@ export default function LoginForm() {
               placeholder="you@pharaonx.com"
               required
               autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#b31313] sm:text-sm/6"
             />
           </div>
@@ -42,6 +75,8 @@ export default function LoginForm() {
               type="password"
               required
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#b31313] sm:text-sm/6"
             />
           </div>
@@ -53,6 +88,9 @@ export default function LoginForm() {
 
       {/* login demo line */}
       <LoginDemo />
+      {error && <div className="mt-4 text-red-600">{error}</div>}
+
+      {user && <div className="mt-4 text-green-600">Logged in as {user}</div>}
     </div>
   )
 }
