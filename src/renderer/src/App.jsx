@@ -1,11 +1,11 @@
-import LoginPage from './pages/LoginPage'
+import Home from './pages/Home'
+// import LoginPage from './pages/LoginPage'
 
 function App() {
-  // const ipcHandle = () => window.electron.ipcRenderer.send('ping')
-
   return (
     <>
-      <LoginPage />
+      {/* <LoginPage /> */}
+      <Home />
     </>
   )
 }
