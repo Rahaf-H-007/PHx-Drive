@@ -1,5 +1,13 @@
 import { useState } from 'react'
 import FileRow from './FileRow'
+import {
+  ArrowPathIcon,
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+  WifiIcon
+} from '@heroicons/react/24/solid'
+import { ServerIcon } from '@heroicons/react/24/outline'
+// import { WifiIcon } from '@heroicons/react/16/solid'
 
 export default function MenuFiles() {
   const [search, setSearch] = useState('')
@@ -89,10 +97,10 @@ export default function MenuFiles() {
           className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border
             border-green-200 rounded-full"
         >
-          {/* <WifiIcon className="w-3.5 h-3.5 text-green-600" /> */}
-          <span className="text-xs font-medium text-green-700">Online — syncing</span>
-          {/* <SyncIcon className="w-3 h-3 text-green-600" /> */}
-          {/* <ChevronDownIcon className="w-3 h-3 text-green-500" /> */}
+          <WifiIcon className="w-3.5 h-3.5 text-green-600" />
+          <span className="text-xs font-medium text-green-700">Online. Syncing</span>
+          <ArrowPathIcon className="w-3 h-3 text-green-600" />
+          <ChevronDownIcon className="w-3 h-3 text-green-500" />
         </div>
       </header>
 
@@ -103,10 +111,10 @@ export default function MenuFiles() {
       >
         {/* Search */}
         <div className="relative w-72">
-          {/* <SearchIcon
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4
+          <MagnifyingGlassIcon
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4
               text-gray-400 pointer-events-none"
-            /> */}
+          />
           <input
             type="text"
             placeholder="Search files..."
@@ -133,10 +141,10 @@ export default function MenuFiles() {
 
           <button
             className="flex items-center gap-2 px-4 py-2 bg-red-800 hover:bg-red-900
-                active:scale-[0.97] text-white text-sm font-semibold rounded-lg
+                active:scale-[0.97] text-white text-sm font-bold rounded-lg
                 transition-all duration-150 shadow-sm"
           >
-            {/* <SyncIcon className="w-3.5 h-3.5" /> */}
+            <ArrowPathIcon className="w-5 h-5" />
             Sync Now
           </button>
         </div>
@@ -185,7 +193,7 @@ export default function MenuFiles() {
         className="flex items-center gap-4 px-8 py-4 bg-white border-t
           border-gray-100 shrink-0"
       >
-        {/* <HardDriveIcon className="w-5 h-5 text-red-600 shrink-0" /> */}
+        <ServerIcon className="w-5 h-5 text-red-600 shrink-0" />
 
         <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
           <div

@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+import { DocumentTextIcon } from '@heroicons/react/24/outline'
+
 export default function FileRow({ file, isLast }) {
   return (
     <div
@@ -7,10 +9,12 @@ export default function FileRow({ file, isLast }) {
     >
       {/* Name */}
       <div className="flex items-start gap-3 flex-1 min-w-0 pr-4">
-        <div className="mt-0.5 shrink-0">{/* <FileTypeIcon ext={file.ext} /> */}</div>
+        <div className="mt-0.5 shrink-0">
+          <DocumentTextIcon className="w-5 h-5 text-red-800" />
+        </div>
         <div className="min-w-0">
           <p className="text-sm font-medium text-gray-800 truncate">{file.name}</p>
-          {file.syncPercent != null && (
+          {file.syncPercent && (
             <div className="mt-1.5 space-y-0.5">
               <div className="w-44 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                 <div
