@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import NavItem from './NavItem'
+import {
+  DocumentDuplicateIcon,
+  Square3Stack3DIcon,
+  TrashIcon,
+  Cog6ToothIcon
+} from '@heroicons/react/24/outline'
 
-//TODO: Icons
 const NAV_ITEMS = [
-  { id: 'files', label: 'Files' /* Icon: FilesIcon */ },
-  { id: 'activity', label: 'Activity' /* Icon: ActivityIcon */ },
-  { id: 'trash', label: 'Trash', /* Icon: TrashIcon */ badge: 4 },
-  { id: 'settings', label: 'Settings' /* Icon: SettingsIcon */ }
+  { id: 'files', label: 'Files', Icon: DocumentDuplicateIcon },
+  { id: 'activity', label: 'Activity', Icon: Square3Stack3DIcon },
+  { id: 'trash', label: 'Trash', Icon: TrashIcon, badge: 4 },
+  { id: 'settings', label: 'Settings', Icon: Cog6ToothIcon }
 ]
 
 export default function Navbar() {
