@@ -1,7 +1,10 @@
 /* eslint-disable react/prop-types */
 import { DocumentTextIcon } from '@heroicons/react/24/outline'
+import { fileStatusIcons } from '../icons/fileStatusIcons'
 
 export default function FileRow({ file, isLast }) {
+  const { Icon, iconClass, textClass } = fileStatusIcons[file.status]
+
   return (
     <div
       className={`flex items-start px-6 py-3.5 hover:bg-gray-50/60 transition-colors
@@ -39,7 +42,10 @@ export default function FileRow({ file, isLast }) {
       </div>
 
       {/* Status */}
-      <div className="w-32 shrink-0 pt-0.5">{/* <StatusBadge status={file.status} /> */}</div>
+      <div className="w-32 shrink-0 pt-0.5 flex items-center gap-2">
+        {Icon && <Icon className={`w-5 h-5 ${iconClass}`} />}
+        <span className={`text-sm capitalize ${textClass}`}>{file.status}</span>
+      </div>
     </div>
   )
 }
