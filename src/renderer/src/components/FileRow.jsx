@@ -5,8 +5,6 @@ import FileRowModifiedDate from './FileRowModifiedDate'
 import FileRowSize from './FileRowSize'
 import FileRowStatus from './FileRowStatus'
 
-//TODO:refactor
-
 export default function FileRow({ file, isLast }) {
   const { TypeIcon, typeIconClass } = fileTypeIcons[file.ext]
 

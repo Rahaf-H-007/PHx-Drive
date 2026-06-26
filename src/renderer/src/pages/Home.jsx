@@ -1,6 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import MenuFiles from '../components/MenuFiles'
 import SyncActivity from '../components/SyncActivity'
+import Trash from '../components/Trash'
 
 export default function Home() {
   return (
@@ -10,7 +11,8 @@ export default function Home() {
     >
       <Sidebar />
       {/* <MenuFiles /> */}
-      <SyncActivity />
+      {/* <SyncActivity /> */}
+      <Trash />
     </div>
   )
 }
