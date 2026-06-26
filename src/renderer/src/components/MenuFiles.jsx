@@ -11,10 +11,11 @@ export default function MenuFiles() {
         <p className="text-xs text-gray-400 leading-tight">Your synced files</p>
       </PageHeader>
 
-      <Toolbar />
+      <div className="flex-1 overflow-auto">
+        <Toolbar />
 
-      <FileTable />
-
+        <FileTable />
+      </div>
       <Footer />
     </main>
   )

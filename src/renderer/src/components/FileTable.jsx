@@ -67,7 +67,7 @@ export default function FileTable() {
     }
   ]
   return (
-    <div className="flex-1 px-8 py-5 overflow-auto">
+    <div className="flex-1 px-8 py-5 overflow-auto m-0 mt-2">
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <table className="w-full table-fixed">
           {/* Column headers */}
