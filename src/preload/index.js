@@ -7,7 +7,9 @@ const api = {
       email,
       password
     }),
-  getUsers: () => ipcRenderer.invoke('get-users')
+  // getUsers: () => ipcRenderer.invoke('get-users'),
+  getSession: () => ipcRenderer.invoke('get-session'),
+  logout: () => ipcRenderer.invoke('logout')
 }
 
 try {

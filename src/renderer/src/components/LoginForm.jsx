@@ -1,22 +1,21 @@
+import { useNavigate } from 'react-router-dom'
 import LoginButton from './LoginButton'
 import LoginDemo from './LoginDemo'
 import LoginHeader from './LoginHeader'
 import Logo from './Logo'
 import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function LoginForm() {
+  const navigate = useNavigate()
+  const { setUser } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
-  //use when redirecting
-  // const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState(null)
   const [error, setError] = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
 
-    // setLoading(true)
     setError('')
 
     try {
@@ -27,13 +26,10 @@ export default function LoginForm() {
       }
 
       setUser(result.user)
+      navigate('/', { replace: true })
     } catch (err) {
       setError(err.message)
     }
-    //use when redirecting
-    /* finally {
-      setLoading(false)
-    } */
   }
   return (
     <div className="mt-5 p-8 sm:mx-auto sm:w-full sm:max-w-sm border border-gray-100 rounded-md shadow-[0_8px_48px_rgba(0,0,0,0.1)]">
@@ -89,8 +85,6 @@ export default function LoginForm() {
       {/* login demo line */}
       <LoginDemo />
       {error && <div className="mt-4 text-red-600">{error}</div>}
-
-      {user && <div className="mt-4 text-green-600">Logged in as {user}</div>}
     </div>
   )
 }

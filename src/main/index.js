@@ -1,11 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
-import axios from 'axios'
-import https from 'https'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-
-let BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
-let cookieHeader = ''
+import { optimizer, is } from '@electron-toolkit/utils'
+import { initSession, registerAuthHandlers } from './auth'
 
 function createWindow() {
   // Create the browser window.
@@ -52,66 +48,11 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+  // get session
+  initSession()
 
-  ipcMain.handle('login', async (_, { email, password }) => {
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/method/login`,
-        new URLSearchParams({
-          usr: email,
-          pwd: password
-        }),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          httpsAgent: new https.Agent({
-            rejectUnauthorized: false
-          })
-        }
-      )
-
-      const cookies = response.headers['set-cookie']
-
-      cookieHeader = cookies.map((c) => c.split(';')[0]).join('; ')
-
-      const loggedUser = await axios.get(`${BASE_URL}/method/frappe.auth.get_logged_user`, {
-        headers: {
-          Cookie: cookieHeader
-        },
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      })
-
-      return {
-        success: true,
-        user: loggedUser.data.message
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data.message || error.message
-      }
-    }
-  })
-
-  ipcMain.handle('get-users', async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/resource/User`, {
-        headers: {
-          Cookie: cookieHeader
-        },
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      })
-
-      return response.data
-    } catch (error) {
-      throw new Error(error.message)
-    }
-  })
+  // register all auth  handlers
+  registerAuthHandlers(ipcMain)
 })
 
 //TODO: uncomment when done

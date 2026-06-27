@@ -1,7 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import MenuFiles from '../components/MenuFiles'
-import SyncActivity from '../components/SyncActivity'
-import Trash from '../components/Trash'
+// import SyncActivity from '../components/SyncActivity'
+// import Trash from '../components/Trash'
 import Settings from '../components/Settings'
 
 export default function Home() {
