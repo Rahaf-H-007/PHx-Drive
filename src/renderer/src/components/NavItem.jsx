@@ -1,9 +1,13 @@
 /* eslint-disable react/prop-types */
-export default function NavItem({ item, active, onClick }) {
+import { useNavigate } from 'react-router-dom'
+
+export default function NavItem({ item, active }) {
   const { Icon } = item
+  const navigate = useNavigate()
+
   return (
     <button
-      onClick={onClick}
+      onClick={() => navigate(item.path)}
       className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-left
         transition-colors duration-100 hover:cursor-pointer
         ${

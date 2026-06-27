@@ -1,8 +1,5 @@
 import Sidebar from '../components/Sidebar'
-import MenuFiles from '../components/MenuFiles'
-// import SyncActivity from '../components/SyncActivity'
-// import Trash from '../components/Trash'
-import Settings from '../components/Settings'
+import { Outlet } from 'react-router-dom'
 
 export default function Home() {
   return (
@@ -11,10 +8,7 @@ export default function Home() {
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
     >
       <Sidebar />
-      {/* <MenuFiles /> */}
-      {/* <SyncActivity /> */}
-      {/* <Trash /> */}
-      <Settings />
+      <Outlet />
     </div>
   )
 }
