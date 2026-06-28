@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'

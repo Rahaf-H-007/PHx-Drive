@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { optimizer, is } from '@electron-toolkit/utils'
 import { initSession, registerAuthHandlers } from './auth'
+import { registerFileHandlers } from './files'
 
 function createWindow() {
   // Create the browser window.
@@ -53,6 +54,9 @@ app.whenReady().then(() => {
 
   // register all auth  handlers
   registerAuthHandlers(ipcMain)
+
+  //regitser file handlers
+  registerFileHandlers(ipcMain)
 })
 
 //TODO: uncomment when done

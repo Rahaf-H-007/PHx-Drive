@@ -91,18 +91,6 @@ export function registerAuthHandlers(ipcMain) {
     clearSession()
     return { success: true }
   })
-
-  // handlers that need the cookie use getCookieHeader
-  //might not need this one now
-  //   ipcMain.handle('get-users', async () => {
-  //     try {
-  //       const response = await axios.get(`${BASE_URL}/resource/User`, {
-  //         headers: { Cookie: getCookieHeader() },
-  //         httpsAgent: new https.Agent({ rejectUnauthorized: false })
-  //       })
-  //       return response.data
-  //     } catch (error) {
-  //       throw new Error(error.message)
-  //     }
-  //   })
 }
+
+// handlers that need the cookie use getCookieHeader
