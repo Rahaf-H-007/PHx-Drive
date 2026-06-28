@@ -12,11 +12,13 @@ export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
 
     setError('')
+    setIsLoading(true)
 
     try {
       const result = await window.api.login(email, password)
@@ -29,6 +31,8 @@ export default function LoginForm() {
       navigate('/', { replace: true })
     } catch (err) {
       setError(err.message)
+    } finally {
+      setIsLoading(false)
     }
   }
   return (
@@ -79,7 +83,7 @@ export default function LoginForm() {
         </div>
 
         {/* button */}
-        <LoginButton>Sign In</LoginButton>
+        <LoginButton isLoading={isLoading} />
       </form>
 
       {/* login demo line */}
