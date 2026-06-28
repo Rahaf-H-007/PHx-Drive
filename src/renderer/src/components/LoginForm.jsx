@@ -27,7 +27,7 @@ export default function LoginForm() {
         throw new Error(result.error || 'Login failed')
       }
 
-      setUser(result.user)
+      setUser({ user: result.user, owner: result.owner })
       navigate('/', { replace: true })
     } catch (err) {
       setError(err.message)

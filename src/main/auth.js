@@ -11,6 +11,7 @@ const SESSION_PATH = join(app.getPath('userData'), 'session.enc')
 // cookieHeader is private in this file
 // nothing outside can touch it directly
 let cookieHeader = null
+let owner = null
 
 function saveSession(cookie) {
   const encrypted = safeStorage.encryptString(cookie)
@@ -64,7 +65,15 @@ export function registerAuthHandlers(ipcMain) {
         httpsAgent: new https.Agent({ rejectUnauthorized: false })
       })
 
-      return { success: true, user: loggedUser.data.message }
+      owner = decodeURIComponent(
+        cookies
+          .find((c) => c.startsWith('full_name='))
+          ?.split(';')[0]
+          .split('=')[1]
+          .replace(/\+/g, ' ') ?? ''
+      )
+
+      return { success: true, user: loggedUser.data.message, owner }
     } catch (error) {
       return { success: false, error: error.response?.data.message || error.message }
     }
@@ -78,7 +87,16 @@ export function registerAuthHandlers(ipcMain) {
         headers: { Cookie: cookieHeader },
         httpsAgent: new https.Agent({ rejectUnauthorized: false })
       })
-      return response.data.message
+
+      owner = decodeURIComponent(
+        cookieHeader
+          .split('; ')
+          .find((c) => c.startsWith('full_name='))
+          ?.split('=')[1]
+          .replace(/\+/g, ' ') ?? ''
+      )
+      console.log(owner)
+      return { user: response.data.message, owner }
     } catch {
       cookieHeader = null
       clearSession()
