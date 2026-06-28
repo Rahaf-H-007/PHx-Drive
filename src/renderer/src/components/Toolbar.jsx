@@ -1,9 +1,8 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react'
 import { ArrowPathIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 
-//TODO:implemetn search
-export default function Toolbar() {
-  const [search, setSearch] = useState('')
+export default function Toolbar({ search, setSearch }) {
   const [autoSync, setAutoSync] = useState(false)
   return (
     <div

@@ -2,8 +2,10 @@ import PageHeader from './PageHeader'
 import Toolbar from './Toolbar'
 import FileTable from './FileTable'
 import Footer from './Footer'
+import { useState } from 'react'
 
 export default function MenuFiles() {
+  const [search, setSearch] = useState('')
   return (
     <main className="flex-1 flex flex-col overflow-hidden">
       <PageHeader>
@@ -12,9 +14,9 @@ export default function MenuFiles() {
       </PageHeader>
 
       <div className="flex-1 overflow-auto">
-        <Toolbar />
+        <Toolbar search={search} setSearch={setSearch} />
 
-        <FileTable />
+        <FileTable search={search} />
       </div>
       <Footer />
     </main>

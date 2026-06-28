@@ -1,9 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react'
 import FileRow from './FileRow'
 import LoadingSpinner from './LoadingSpinner'
 import EmptyFiles from './EmptyFiles'
 
-export default function FileTable() {
+export default function FileTable({ search }) {
   const [files, setFiles] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -29,6 +30,11 @@ export default function FileTable() {
     loadFiles()
   }, [])
 
+  const filteredFiles = files.filter((file) => {
+    const term = search.toLowerCase()
+    return file.title?.toLowerCase().includes(term) || file.name?.toLowerCase().includes(term)
+  })
+
   return (
     <div className="flex-1 px-8 py-5 overflow-auto m-0 mt-2">
       <div className="border border-gray-100 rounded-xl shadow-sm overflow-hidden">
@@ -36,9 +42,9 @@ export default function FileTable() {
         {isLoading && <LoadingSpinner />}
 
         {/* empty files */}
-        {!isLoading && files.length === 0 && <EmptyFiles />}
+        {!isLoading && filteredFiles.length === 0 && <EmptyFiles />}
 
-        {!isLoading && files.length > 0 && (
+        {!isLoading && filteredFiles.length > 0 && (
           <table className="w-full table-fixed bg-white">
             {/* Column headers */}
             <thead>
@@ -75,8 +81,8 @@ export default function FileTable() {
 
             {/* Rows */}
             <tbody>
-              {files.map((file, idx) => (
-                <FileRow key={file.name} file={file} isLast={idx === files.length - 1} />
+              {filteredFiles.map((file, idx) => (
+                <FileRow key={file.name} file={file} isLast={idx === filteredFiles.length - 1} />
               ))}
             </tbody>
           </table>
