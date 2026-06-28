@@ -2,24 +2,8 @@ import PageHeader from './PageHeader'
 import Toolbar from './Toolbar'
 import FileTable from './FileTable'
 import Footer from './Footer'
-import { useEffect, useState } from 'react'
 
 export default function MenuFiles() {
-  const [homeId, setHomeId] = useState('Loading...')
-  useEffect(() => {
-    async function loadHomeId() {
-      const result = await window.api.getHomeId()
-
-      if (result.success) {
-        setHomeId(result.homeId)
-      } else {
-        setHomeId(`Error: ${result.error}`)
-      }
-    }
-
-    loadHomeId()
-  }, [])
-
   return (
     <main className="flex-1 flex flex-col overflow-hidden">
       <PageHeader>

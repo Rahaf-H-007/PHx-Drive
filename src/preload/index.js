@@ -9,7 +9,7 @@ const api = {
     }),
   getSession: () => ipcRenderer.invoke('get-session'),
   logout: () => ipcRenderer.invoke('logout'),
-  getHomeId: () => ipcRenderer.invoke('get-home-id')
+  getFiles: () => ipcRenderer.invoke('get-files')
 }
 
 try {

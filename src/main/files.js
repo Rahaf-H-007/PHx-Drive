@@ -24,17 +24,30 @@ export async function getHomeId() {
   return response.data.message
 }
 
-//get home folder id
+//get home folder id and diplay files inside it
 export function registerFileHandlers(ipcMain) {
-  ipcMain.handle('get-home-id', async () => {
+  ipcMain.handle('get-files', async () => {
     try {
-      const homeId = await getHomeId()
-      return { success: true, homeId }
+      const homeFolder = await getHomeId()
+      const response = await axios.get(`${BASE_URL}/method/drive.api.list.files`, {
+        params: {
+          entity_name: homeFolder,
+          is_active: 1,
+          limit: 60,
+          favourites_only: false,
+          recents_only: false,
+          file_kind_list: '[]',
+          tag_list: '[]'
+        },
+        headers: {
+          Cookie: getCookieHeader()
+        },
+        httpsAgent: new https.Agent({ rejectUnauthorized: false })
+      })
+      console.log(response.data.message)
+      return { success: true, message: response.data.message }
     } catch (err) {
       return { success: false, error: err.message }
     }
   })
 }
-
-//TODO
-//list files in home folder

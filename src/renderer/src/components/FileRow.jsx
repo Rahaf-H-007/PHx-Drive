@@ -5,8 +5,9 @@ import FileRowModifiedDate from './FileRowModifiedDate'
 import FileRowSize from './FileRowSize'
 import FileRowStatus from './FileRowStatus'
 
+//TODO: display file properties
 export default function FileRow({ file, isLast }) {
-  const { TypeIcon, typeIconClass } = fileTypeIcons[file.ext]
+  // const { TypeIcon, typeIconClass } = fileTypeIcons[file.ext]
 
   return (
     <tr
@@ -18,7 +19,7 @@ export default function FileRow({ file, isLast }) {
           {/* TODO: later make it based on mime types not extensions */}
           {/* icon */}
           <div className="mt-0.5 shrink-0">
-            {TypeIcon && <TypeIcon className={`w-5 h-5 ${typeIconClass}`} />}
+            {/* {TypeIcon && <TypeIcon className={`w-5 h-5 ${typeIconClass}`} />} */}
           </div>
 
           {/* name */}
@@ -43,7 +44,7 @@ export default function FileRow({ file, isLast }) {
       <FileRowModifiedDate modified={file.modified} />
 
       {/* Status */}
-      <FileRowStatus status={file.status} />
+      {/* <FileRowStatus status={file.status} /> */}
     </tr>
   )
 }
