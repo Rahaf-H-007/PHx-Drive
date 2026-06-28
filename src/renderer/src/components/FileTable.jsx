@@ -31,7 +31,7 @@ export default function FileTable() {
 
   return (
     <div className="flex-1 px-8 py-5 overflow-auto m-0 mt-2">
-      <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+      <div className="border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         {/* loading */}
         {isLoading && <LoadingSpinner />}
 
@@ -39,7 +39,7 @@ export default function FileTable() {
         {!isLoading && files.length === 0 && <EmptyFiles />}
 
         {!isLoading && files.length > 0 && (
-          <table className="w-full table-fixed">
+          <table className="w-full table-fixed bg-white">
             {/* Column headers */}
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
@@ -61,7 +61,7 @@ export default function FileTable() {
                   className="w-44 px-0 py-3 text-left text-[11px] font-semibold text-gray-400
               uppercase tracking-[0.08em]"
                 >
-                  Modified
+                  Added
                 </th>
 
                 <th

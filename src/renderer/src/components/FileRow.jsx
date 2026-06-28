@@ -39,9 +39,8 @@ export default function FileRow({ file, isLast }) {
       {/* Size */}
       <FileRowSize size={file.file_size} />
 
-      {/* TODO:add file modifed as proper date and time */}
       {/* Modified */}
-      <FileRowModifiedDate modified={file.modified} />
+      <FileRowModifiedDate added={file.creation} />
 
       {/* TODO: when inregrating DB */}
       {/* Status */}
