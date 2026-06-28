@@ -1,13 +1,14 @@
 /* eslint-disable react/prop-types */
-import { fileTypeIcons } from '../icons/fileTypeIcons'
-import FileProgressBar from './FileProgressBar'
+import { getFileIcon } from '../icons/fileTypeIcons'
+// import FileProgressBar from './FileProgressBar'
 import FileRowModifiedDate from './FileRowModifiedDate'
 import FileRowSize from './FileRowSize'
-import FileRowStatus from './FileRowStatus'
+// import FileRowStatus from './FileRowStatus'
 
 //TODO: display file properties
 export default function FileRow({ file, isLast }) {
-  // const { TypeIcon, typeIconClass } = fileTypeIcons[file.ext]
+  // const { TypeIcon, typeIconClass } = fileTypeIcons[file.file_ext]
+  const { TypeIcon, typeIconClass } = getFileIcon(file)
 
   return (
     <tr
@@ -19,18 +20,18 @@ export default function FileRow({ file, isLast }) {
           {/* TODO: later make it based on mime types not extensions */}
           {/* icon */}
           <div className="mt-0.5 shrink-0">
-            {/* {TypeIcon && <TypeIcon className={`w-5 h-5 ${typeIconClass}`} />} */}
+            {TypeIcon && <TypeIcon className={`w-5 h-5 ${typeIconClass}`} />}
           </div>
 
           {/* name */}
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">{file.name}</p>
+            <p className="text-sm font-medium text-gray-800 truncate">{file.title}</p>
 
             {/* progress bar */}
             {file.syncPercent && (
               <div className="mt-1.5 space-y-0.5">
-                <FileProgressBar syncPercent={file.syncPercent} />
-                <span className="text-[11px] text-gray-400">{file.syncPercent}%</span>
+                {/* <FileProgressBar syncPercent={file.syncPercent} />
+                <span className="text-[11px] text-gray-400">{file.syncPercent}%</span> */}
               </div>
             )}
           </div>
@@ -38,12 +39,14 @@ export default function FileRow({ file, isLast }) {
       </td>
 
       {/* Size */}
-      <FileRowSize size={file.size} />
+      <FileRowSize size={file.file_size} />
 
+      {/* TODO:add file modifed as proper date and time */}
       {/* Modified */}
       <FileRowModifiedDate modified={file.modified} />
 
       {/* Status */}
+      {/* most likely fromDB */}
       {/* <FileRowStatus status={file.status} /> */}
     </tr>
   )

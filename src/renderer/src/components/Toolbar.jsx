@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowPathIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 
+//TODO:implemetn search
 export default function Toolbar() {
   const [search, setSearch] = useState('')
   const [autoSync, setAutoSync] = useState(false)

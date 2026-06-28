@@ -1,74 +1,9 @@
 import { useEffect, useState } from 'react'
 import FileRow from './FileRow'
 
-//TODO: display files properly and get rid of FILES
+//TODO: add loading state
+//TODO: Add empty state
 export default function FileTable() {
-  // const FILES = [
-  //   {
-  //     id: 1,
-  //     name: 'Q2_Financial_Report.pdf',
-  //     ext: 'pdf',
-  //     size: '4.2 MB',
-  //     modified: '2026-06-21 14:30',
-  //     status: 'synced',
-  //     syncPercent: 100
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Design_Assets_v3.zip',
-  //     ext: 'zip',
-  //     size: '128 MB',
-  //     modified: '2026-06-22 09:15',
-  //     status: 'syncing',
-  //     syncPercent: 62
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Budget_2026.xlsx',
-  //     ext: 'xlsx',
-  //     size: '1.1 MB',
-  //     modified: '2026-06-20 11:00',
-  //     status: 'conflict',
-  //     syncPercent: 90
-  //   },
-  //   {
-  //     id: 4,
-  //     name: 'Meeting_Notes_draft.txt',
-  //     ext: 'txt',
-  //     size: '12 KB',
-  //     modified: '2026-06-18 16:45',
-  //     status: 'error',
-  //     syncPercent: 50
-  //   },
-  //   {
-  //     id: 5,
-  //     name: 'Product_Roadmap_2026.pptx',
-  //     ext: 'pptx',
-  //     size: '55 MB',
-  //     modified: '2026-06-19 08:00',
-  //     status: 'synced',
-  //     syncPercent: 100
-  //   },
-  //   {
-  //     id: 6,
-  //     name: 'Team_Photo_Offsite.jpg',
-  //     ext: 'jpg',
-  //     size: '8.7 MB',
-  //     modified: '2026-06-17 13:22',
-  //     status: 'synced',
-  //     syncPercent: 100
-  //   },
-  //   {
-  //     id: 7,
-  //     name: 'Client_Proposal_Final.docx',
-  //     ext: 'docx',
-  //     size: '2.3 MB',
-  //     modified: '2026-06-22 11:50',
-  //     status: 'syncing',
-  //     syncPercent: 35
-  //   }
-  // ]
-
   const [files, setFiles] = useState([])
   useEffect(() => {
     async function loadFiles() {

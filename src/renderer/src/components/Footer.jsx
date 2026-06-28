@@ -1,4 +1,6 @@
 import { ServerIcon } from '@heroicons/react/24/outline'
+
+// TODO:diplay storage quota
 export default function Footer() {
   const STORAGE_USED = 41.2
   const STORAGE_TOTAL = 50
@@ -21,6 +23,7 @@ export default function Footer() {
         {STORAGE_USED} / {STORAGE_TOTAL} GB
       </span>
 
+      {/* TODO: check what this is for */}
       <button
         className="text-sm text-gray-400 hover:text-gray-600 transition-colors
         shrink-0 whitespace-nowrap"

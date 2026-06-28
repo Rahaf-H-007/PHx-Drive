@@ -1,3 +1,4 @@
+//TODO:display owner name
 export default function UserProfile() {
   return (
     <div className="flex items-center gap-3 px-5 py-4 border-t border-gray-100 shrink-0">
