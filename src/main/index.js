@@ -3,6 +3,7 @@ import { join } from 'path'
 import { optimizer, is } from '@electron-toolkit/utils'
 import { initSession, registerAuthHandlers } from './auth'
 import { registerFileHandlers } from './files'
+import { registerSettingsHandlers } from './settings'
 
 function createWindow() {
   // Create the browser window.
@@ -57,6 +58,8 @@ app.whenReady().then(() => {
 
   //regitser file handlers
   registerFileHandlers(ipcMain)
+
+  registerSettingsHandlers(ipcMain)
 })
 
 //TODO: uncomment when done

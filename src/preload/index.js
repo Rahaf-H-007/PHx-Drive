@@ -9,7 +9,10 @@ const api = {
     }),
   getSession: () => ipcRenderer.invoke('get-session'),
   logout: () => ipcRenderer.invoke('logout'),
-  getFiles: () => ipcRenderer.invoke('get-files')
+  getFiles: () => ipcRenderer.invoke('get-files'),
+  selectSyncFolder: () => ipcRenderer.invoke('sync-folder:select'),
+  saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings),
+  loadSettings: () => ipcRenderer.invoke('settings:load')
 }
 
 try {

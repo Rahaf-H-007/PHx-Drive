@@ -24,7 +24,8 @@ function loadSession() {
   try {
     const encrypted = readFileSync(SESSION_PATH)
     return safeStorage.decryptString(encrypted)
-  } catch {
+  } catch (err) {
+    console.log(err)
     return null
   }
 }
