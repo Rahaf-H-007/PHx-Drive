@@ -45,3 +45,6 @@ export const setState = (path, state) =>
 export const deleteFile = (path) => db.prepare('DELETE FROM metadata WHERE path = ?').run(path)
 export const getRemoteId = (path) =>
   db.prepare('SELECT remote_id FROM metadata WHERE path = ?').get(path)?.remote_id
+export function clearMetadata() {
+  db.prepare('DELETE FROM metadata').run()
+}

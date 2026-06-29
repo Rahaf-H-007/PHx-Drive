@@ -1,6 +1,8 @@
 import { app, dialog, safeStorage } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { startWatcher, stopWatcher, syncFolder } from './sync'
+import { clearMetadata } from './db/metadata'
 const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
 
 export function registerSettingsHandlers(ipcMain) {
@@ -17,16 +19,41 @@ export function registerSettingsHandlers(ipcMain) {
     return result.filePaths[0]
   })
 
-  ipcMain.handle('settings:save', (_, settings) => {
+  ipcMain.handle('settings:save', async (_, settings) => {
     try {
+      const previousSettings = loadSettings()
+
+      const syncFolderChanged = previousSettings.syncFolder !== settings.syncFolder
+
+      if (syncFolderChanged) {
+        clearMetadata()
+      }
+
       saveSettings(settings)
+
+      console.log({
+        previous: previousSettings.syncFolder,
+        current: settings.syncFolder,
+        changed: syncFolderChanged
+      })
+      // Populate the new sync folder from Frappe before starting the watcher
+      if (syncFolderChanged) {
+        await syncFolder(settings.syncFolder, 'initialDownload')
+      }
+
+      await stopWatcher()
+
+      if (settings.syncMode === 'automatic') {
+        startWatcher(settings.syncFolder)
+      }
+
       return {
         success: true
       }
-    } catch (err) {
+    } catch (error) {
       return {
         success: false,
-        error: err.message
+        error: error.message
       }
     }
   })

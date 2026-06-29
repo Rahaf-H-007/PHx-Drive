@@ -8,7 +8,10 @@ import { getHomeId } from './files'
 import { getCookieHeader } from './auth'
 import { createHash, randomUUID } from 'crypto'
 import { createReadStream } from 'fs'
+import chokidar from 'chokidar'
 
+let watcher
+let syncTimer
 const BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
 
 export async function registerSyncHandlers(ipcMain) {
@@ -21,14 +24,22 @@ export async function registerSyncHandlers(ipcMain) {
     }
   })
 }
-async function syncFolder(syncFolderPath) {
+
+export async function syncFolder(syncFolderPath, mode = 'normal') {
+  console.log('Sync started')
   const localFiles = await scanLocal(syncFolderPath)
   const remoteFiles = await scanRemote()
   const dbFiles = getAllFiles()
 
-  const operations = compareSnapshots(localFiles, remoteFiles, dbFiles)
+  const operations = compareSnapshots(localFiles, remoteFiles, dbFiles, mode)
 
-  console.log(operations)
+  console.log({
+    mode,
+    local: localFiles.length,
+    remote: remoteFiles.length,
+    db: dbFiles.length,
+    operations
+  })
 
   for (const operation of operations) {
     switch (operation.type) {
@@ -148,7 +159,7 @@ export async function scanRemote() {
   return entries
 }
 
-export function compareSnapshots(localFiles, remoteFiles, dbFiles) {
+export function compareSnapshots(localFiles, remoteFiles, dbFiles, mode = 'normal') {
   const operations = []
 
   const localMap = new Map(localFiles.map((file) => [file.path, file]))
@@ -163,10 +174,12 @@ export function compareSnapshots(localFiles, remoteFiles, dbFiles) {
     const db = dbMap.get(path)
 
     if (local && !remote && !db) {
-      operations.push({
-        type: 'upload',
-        item: local
-      })
+      if (mode === 'normal') {
+        operations.push({
+          type: 'upload',
+          item: local
+        })
+      }
     } else if (!local && remote && !db) {
       operations.push({
         type: 'download',
@@ -371,4 +384,28 @@ async function keepLocalItem(local) {
   deleteFile(local.path)
 
   console.log(`Stopped tracking: ${local.path}`)
+}
+
+export function startWatcher(syncFolderPath) {
+  watcher = chokidar.watch(syncFolderPath, {
+    ignoreInitial: true,
+    persistent: true
+  })
+  console.log('Watching:', syncFolderPath)
+
+  watcher.on('all', (event, path) => {
+    console.log(event, path)
+    clearTimeout(syncTimer)
+
+    syncTimer = setTimeout(async () => {
+      await syncFolder(syncFolderPath)
+    }, 1000)
+  })
+}
+
+export async function stopWatcher() {
+  if (watcher) {
+    await watcher.close()
+    watcher = null
+  }
 }
