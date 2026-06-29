@@ -2,7 +2,6 @@ import NavItem from './NavItem'
 import {
   DocumentDuplicateIcon,
   Square3Stack3DIcon,
-  TrashIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline'
 import { useLocation } from 'react-router-dom'
@@ -10,7 +9,6 @@ import { useLocation } from 'react-router-dom'
 const NAV_ITEMS = [
   { id: 'files', label: 'Files', Icon: DocumentDuplicateIcon, path: '/' },
   { id: 'activity', label: 'Activity', Icon: Square3Stack3DIcon, path: '/syncactivity' },
-  { id: 'trash', label: 'Trash', Icon: TrashIcon, path: '/trash', badge: 4 },
   { id: 'settings', label: 'Settings', Icon: Cog6ToothIcon, path: '/settings' }
 ]
 
