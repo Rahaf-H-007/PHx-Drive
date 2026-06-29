@@ -1,12 +1,12 @@
-import { getAllFiles, updateFile } from './db/metadata'
+import { getAllFiles, updateFile, getRemoteId } from './db/metadata'
 import { loadSettings } from './settings'
-import { mkdir, writeFile, readdir, stat } from 'fs/promises'
-import { join, relative, dirname } from 'path'
+import { mkdir, writeFile, readdir, stat, readFile } from 'fs/promises'
+import { join, relative, dirname, basename } from 'path'
 import axios from 'axios'
 import https from 'https'
 import { getHomeId } from './files'
 import { getCookieHeader } from './auth'
-import { createHash } from 'crypto'
+import { createHash, randomUUID } from 'crypto'
 import { createReadStream } from 'fs'
 
 const BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
@@ -178,7 +178,74 @@ export function compareSnapshots(localFiles, remoteFiles, dbFiles) {
 }
 
 async function uploadItem(item, syncFolderPath) {
-  console.log('Uploading:', item.path)
+  const parentPath = dirname(item.path)
+
+  const parent = parentPath === '.' ? await getHomeId() : getRemoteId(parentPath)
+
+  if (item.type === 'directory') {
+    const response = await axios.post(
+      `${BASE_URL}/method/drive.api.files.create_folder`,
+      {
+        title: basename(item.path),
+        parent
+      },
+      {
+        headers: {
+          Cookie: getCookieHeader()
+        },
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
+      }
+    )
+
+    updateFile({
+      path: item.path,
+      content_hash: null,
+      size: null,
+      remote_id: response.data.message.name,
+      version: null,
+      state: 'synced',
+      last_synced_at: Date.now()
+    })
+
+    console.log(`Created remote folder: ${item.path}`)
+    return
+  }
+
+  const bytes = await readFile(join(syncFolderPath, item.path))
+
+  const form = new FormData()
+
+  form.append('uuid', randomUUID())
+  form.append('chunk_index', '0')
+  form.append('total_file_size', String(item.size))
+  form.append('chunk_size', '20971520')
+  form.append('total_chunk_count', '1')
+  form.append('chunk_byte_offset', '0')
+  form.append('last_modified', String(Date.now()))
+  form.append('parent', parent)
+  form.append('file', new Blob([bytes]), basename(item.path))
+
+  const response = await axios.post(`${BASE_URL}/method/drive.api.files.upload_file`, form, {
+    headers: {
+      Cookie: getCookieHeader()
+    },
+    httpsAgent: new https.Agent({
+      rejectUnauthorized: false
+    })
+  })
+
+  updateFile({
+    path: item.path,
+    content_hash: item.content_hash,
+    size: item.size,
+    remote_id: response.data.message.name,
+    state: 'synced',
+    last_synced_at: Date.now()
+  })
+
+  console.log(`Uploaded file: ${item.path}`)
 }
 
 async function downloadItem(item, syncFolderPath) {

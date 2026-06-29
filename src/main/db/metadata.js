@@ -43,3 +43,5 @@ export const getAllFiles = () => db.prepare('SELECT * FROM metadata').all()
 export const setState = (path, state) =>
   db.prepare('UPDATE metadata SET state = ? WHERE path = ?').run(state, path)
 export const deleteFile = (path) => db.prepare('DELETE FROM metadata WHERE path = ?').run(path)
+export const getRemoteId = (path) =>
+  db.prepare('SELECT remote_id FROM metadata WHERE path = ?').get(path)?.remote_id
