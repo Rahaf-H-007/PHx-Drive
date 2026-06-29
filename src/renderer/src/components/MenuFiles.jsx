@@ -6,6 +6,11 @@ import { useState } from 'react'
 
 export default function MenuFiles() {
   const [search, setSearch] = useState('')
+  async function handleSyncNow() {
+    const result = await window.api.manualSync()
+
+    console.log(result)
+  }
   return (
     <main className="flex-1 flex flex-col overflow-hidden">
       <PageHeader>
@@ -14,7 +19,7 @@ export default function MenuFiles() {
       </PageHeader>
 
       <div className="flex-1 overflow-auto">
-        <Toolbar search={search} setSearch={setSearch} />
+        <Toolbar search={search} setSearch={setSearch} onSyncNow={handleSyncNow} />
 
         <FileTable search={search} />
       </div>

@@ -53,7 +53,7 @@ function saveSettings(settings) {
   // console.log(SETTINGS_PATH)
 }
 
-function loadSettings() {
+export function loadSettings() {
   if (!safeStorage.isEncryptionAvailable()) return null
   if (!existsSync(SETTINGS_PATH)) return null
   try {

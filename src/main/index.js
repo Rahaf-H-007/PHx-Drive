@@ -4,6 +4,7 @@ import { optimizer, is } from '@electron-toolkit/utils'
 import { initSession, registerAuthHandlers } from './auth'
 import { registerFileHandlers } from './files'
 import { registerSettingsHandlers } from './settings'
+import { registerSyncHandlers } from './sync'
 
 function createWindow() {
   // Create the browser window.
@@ -60,6 +61,8 @@ app.whenReady().then(() => {
   registerFileHandlers(ipcMain)
 
   registerSettingsHandlers(ipcMain)
+
+  registerSyncHandlers(ipcMain)
 })
 
 //TODO: uncomment when done

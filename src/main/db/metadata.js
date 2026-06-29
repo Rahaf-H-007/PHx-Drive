@@ -12,7 +12,6 @@ db.exec(`
     content_hash TEXT,
     size INTEGER,
     remote_id TEXT,
-    version TEXT,
     state TEXT NOT NULL DEFAULT 'pending' CHECK(state IN ('synced', 'pending', 'conflict', 'error')),
     last_synced_at INTEGER
   )
@@ -22,30 +21,21 @@ db.exec(`
 //what this means:
 // insert this row. If a row with this path already exists,
 // don't insert a duplicate and instead take the existing row
-// and overwrite its content_hash, size, remote_id, version, state, and last_synced_at
+// and overwrite its content_hash, size, remote_id, , state, and last_synced_at
 // with the new values.
-export function updateFile({
-  path,
-  content_hash,
-  size,
-  remote_id,
-  version,
-  state,
-  last_synced_at
-}) {
+export function updateFile({ path, content_hash, size, remote_id, state, last_synced_at }) {
   db.prepare(
     `
-    INSERT INTO metadata (path, content_hash, size, remote_id, version, state, last_synced_at)
-    VALUES (@path, @content_hash, @size, @remote_id, @version, @state, @last_synced_at)
+    INSERT INTO metadata (path, content_hash, size, remote_id,  state, last_synced_at)
+    VALUES (@path, @content_hash, @size, @remote_id,  @state, @last_synced_at)
     ON CONFLICT(path) DO UPDATE SET
       content_hash   = excluded.content_hash,
       size           = excluded.size,
       remote_id      = excluded.remote_id,
-      version        = excluded.version,
       state          = excluded.state,
       last_synced_at = excluded.last_synced_at
   `
-  ).run({ path, content_hash, size, remote_id, version, state: state ?? 'pending', last_synced_at })
+  ).run({ path, content_hash, size, remote_id, state: state ?? 'pending', last_synced_at })
 }
 
 export const getFile = (path) => db.prepare('SELECT * FROM metadata WHERE path = ?').get(path)

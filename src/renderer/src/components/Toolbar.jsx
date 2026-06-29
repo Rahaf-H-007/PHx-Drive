@@ -2,8 +2,8 @@
 import { useState } from 'react'
 import { ArrowPathIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 
-export default function Toolbar({ search, setSearch }) {
-  const [autoSync, setAutoSync] = useState(false)
+export default function Toolbar({ search, setSearch, onSyncNow }) {
+  // const [autoSync, setAutoSync] = useState(false)
   return (
     <div
       className="flex items-center gap-4 px-8 py-3.5 bg-white border-b
@@ -29,7 +29,7 @@ export default function Toolbar({ search, setSearch }) {
 
       {/* Right controls */}
       <div className="flex items-center gap-5 ml-auto">
-        <label className="flex items-center gap-2 cursor-pointer">
+        {/* <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             checked={autoSync}
@@ -37,12 +37,13 @@ export default function Toolbar({ search, setSearch }) {
             className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-red-800"
           />
           <span className="text-sm text-gray-600">Automatic sync</span>
-        </label>
+        </label> */}
 
         <button
           className="flex items-center gap-2 px-4 py-2 bg-red-800 hover:bg-red-900 hover:cursor-pointer
                   active:scale-[0.97] text-white text-sm font-bold rounded-lg
                   transition-all duration-150 shadow-sm"
+          onClick={onSyncNow}
         >
           <ArrowPathIcon className="w-5 h-5" />
           Sync Now

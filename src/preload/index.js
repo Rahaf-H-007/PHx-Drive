@@ -12,7 +12,8 @@ const api = {
   getFiles: () => ipcRenderer.invoke('get-files'),
   selectSyncFolder: () => ipcRenderer.invoke('sync-folder:select'),
   saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings),
-  loadSettings: () => ipcRenderer.invoke('settings:load')
+  loadSettings: () => ipcRenderer.invoke('settings:load'),
+  manualSync: () => ipcRenderer.invoke('sync:manual')
 }
 
 try {
