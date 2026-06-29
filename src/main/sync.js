@@ -1,4 +1,4 @@
-import { getAllFiles, updateFile, getRemoteId } from './db/metadata'
+import { getAllFiles, updateFile, getRemoteId, deleteFile } from './db/metadata'
 import { loadSettings } from './settings'
 import { mkdir, writeFile, readdir, stat, readFile } from 'fs/promises'
 import { join, relative, dirname, basename } from 'path'
@@ -43,6 +43,13 @@ async function syncFolder(syncFolderPath) {
       case 'track':
         await trackItem(operation.local, operation.remote)
         break
+      case 'deleteRemote':
+        await deleteRemoteItem(operation.remote)
+        break
+
+      case 'keepLocal':
+        await keepLocalItem(operation.local)
+        break
 
       default:
         console.warn(`Unknown operation: ${operation.type}`)
@@ -60,7 +67,7 @@ export async function scanLocal(syncFolderPath) {
 
     for (const entry of dirEntries) {
       const absolutePath = join(currentDir, entry.name)
-      const relativePath = relative(syncFolderPath, absolutePath)
+      const relativePath = relative(syncFolderPath, absolutePath).replace(/\\/g, '/')
 
       if (entry.isDirectory()) {
         entries.push({
@@ -170,6 +177,20 @@ export function compareSnapshots(localFiles, remoteFiles, dbFiles) {
         type: 'track',
         local,
         remote
+      })
+
+      // NEW
+    } else if (!local && remote && db) {
+      operations.push({
+        type: 'deleteRemote',
+        remote,
+        db
+      })
+    } else if (local && !remote && db) {
+      operations.push({
+        type: 'keepLocal',
+        local,
+        db
       })
     }
   }
@@ -323,4 +344,31 @@ export function hashFile(filePath) {
     stream.on('end', () => resolve(hash.digest('hex')))
     stream.on('error', reject)
   })
+}
+
+async function deleteRemoteItem(remote) {
+  await axios.post(
+    `${BASE_URL}/method/drive.api.files.remove_or_restore`,
+    {
+      entity_names: JSON.stringify([remote.remote_id])
+    },
+    {
+      headers: {
+        Cookie: getCookieHeader()
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
+    }
+  )
+
+  deleteFile(remote.path)
+
+  console.log(`Moved to remote trash: ${remote.path}`)
+}
+
+async function keepLocalItem(local) {
+  deleteFile(local.path)
+
+  console.log(`Stopped tracking: ${local.path}`)
 }
