@@ -24,7 +24,6 @@ function App() {
             <Route index element={<MenuFiles />} />
             <Route path="/menufiles" element={<MenuFiles />} />
             <Route path="/syncactivity" element={<SyncActivity />} />
-
             <Route path="/settings" element={<Settings />} />
           </Route>
 

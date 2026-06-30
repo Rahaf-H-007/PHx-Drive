@@ -1,8 +1,9 @@
 import { app, dialog, safeStorage } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { startWatcher, stopWatcher, syncFolder } from './sync'
 import { clearMetadata } from './db/metadata'
+import { syncFolder } from './sync'
+import { startWatcher, stopWatcher } from './sync-file-watcher'
 const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
 
 export function registerSettingsHandlers(ipcMain) {
