@@ -1,33 +1,24 @@
-import chokidar from 'chokidar'
 import { syncFolder } from './sync'
 
-let watcher
-let syncTimer
+//TODO:how long should the polling inbe
+let pollTimer = null
 
-export function startWatcher(syncFolderPath) {
-  watcher = chokidar.watch(syncFolderPath, {
-    ignoreInitial: true,
-    persistent: true,
-    awaitWriteFinish: {
-      stabilityThreshold: 1000,
-      pollInterval: 100
-    }
-  })
-  console.log('Watching:', syncFolderPath)
+export function startAutoSync(syncFolderPath, intervalMs = 2000) {
+  if (pollTimer) return
 
-  watcher.on('all', (event, path) => {
-    console.log(event, path)
-    clearTimeout(syncTimer)
+  console.log(`Auto sync enabled, polling every ${intervalMs}ms`)
 
-    syncTimer = setTimeout(async () => {
-      await syncFolder(syncFolderPath)
-    }, 1000)
-  })
+  syncFolder(syncFolderPath).catch((err) => console.error('Auto sync error:', err))
+
+  pollTimer = setInterval(() => {
+    syncFolder(syncFolderPath).catch((err) => console.error('Auto sync error:', err))
+  }, intervalMs)
 }
 
-export async function stopWatcher() {
-  if (watcher) {
-    await watcher.close()
-    watcher = null
+export function stopAutoSync() {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+    console.log('Auto sync disabled')
   }
 }

@@ -1,9 +1,7 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react'
 import { ArrowPathIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 
 export default function Toolbar({ search, setSearch, onSyncNow }) {
-  // const [autoSync, setAutoSync] = useState(false)
   return (
     <div
       className="flex items-center gap-4 px-8 py-3.5 bg-white border-b

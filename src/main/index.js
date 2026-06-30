@@ -3,9 +3,8 @@ import { join } from 'path'
 import { optimizer, is } from '@electron-toolkit/utils'
 import { initSession, registerAuthHandlers } from './auth'
 import { registerFileHandlers } from './files'
-import { loadSettings, registerSettingsHandlers } from './settings'
+import { registerSettingsHandlers } from './settings'
 import { registerSyncHandlers } from './sync'
-import { startWatcher } from './sync-file-watcher'
 
 function createWindow() {
   console.log(typeof FormData)
@@ -56,19 +55,13 @@ app.whenReady().then(() => {
   // get session
   initSession()
 
-  // register all auth  handlers
   registerAuthHandlers(ipcMain)
 
-  //regitser file handlers
   registerFileHandlers(ipcMain)
 
   registerSettingsHandlers(ipcMain)
 
   registerSyncHandlers(ipcMain)
-  const settings = loadSettings()
-  if (settings.syncMode === 'automatic' && settings.syncFolder) {
-    startWatcher(settings.syncFolder)
-  }
 })
 
 //TODO: uncomment when done

@@ -4,7 +4,7 @@ import { getFileIcon } from '../icons/fileTypeIcons'
 import FileRowModifiedDate from './FileRowModifiedDate'
 import FileRowSize from './FileRowSize'
 // import FileRowStatus from './FileRowStatus'
-
+//TODO: if file is a doc or whiteboard dont show it on the frontend
 export default function FileRow({ file, isLast }) {
   const { TypeIcon, typeIconClass } = getFileIcon(file)
 

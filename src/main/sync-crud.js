@@ -104,34 +104,41 @@ export async function downloadItem(item, syncFolderPath) {
   // Ensure parent directory exists
   await mkdir(dirname(localPath), { recursive: true })
 
-  const response = await axios.get(`${BASE_URL}/method/drive.api.files.get_file_content`, {
-    params: {
-      entity_name: item.remote_id,
-      trigger_download: 1
-    },
-    headers: {
-      Cookie: getCookieHeader()
-    },
-    responseType: 'arraybuffer',
-    httpsAgent: new https.Agent({
-      rejectUnauthorized: false
+  try {
+    const response = await axios.get(`${BASE_URL}/method/drive.api.files.get_file_content`, {
+      params: {
+        entity_name: item.remote_id,
+        trigger_download: 1
+      },
+      headers: {
+        Cookie: getCookieHeader()
+      },
+      responseType: 'arraybuffer',
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
     })
-  })
 
-  await writeFile(localPath, response.data)
-  const contentHash = await hashFile(localPath)
-  updateFile({
-    path: item.path,
-    content_hash: contentHash,
-    size: item.size,
-    remote_id: item.remote_id,
+    await writeFile(localPath, response.data)
 
-    state: 'synced',
-    last_synced_at: Date.now()
-  })
+    const contentHash = await hashFile(localPath)
 
-  console.log(`Downloaded: ${item.path}`)
-  console.log(localPath)
+    updateFile({
+      path: item.path,
+      content_hash: contentHash,
+      size: item.size,
+      remote_id: item.remote_id,
+      state: 'synced',
+      last_synced_at: Date.now()
+    })
+
+    console.log('Downloaded:', item.path)
+    console.log(localPath)
+  } catch (err) {
+    console.error('Download failed')
+    console.error('item:', item)
+    console.log(err.message)
+  }
 }
 
 export async function trackItem(local, remote) {

@@ -74,6 +74,11 @@ export async function scanRemote() {
     })
 
     for (const item of response.data.message) {
+      // skip frappe files that don't have a download option
+      if (item.mime_type === 'frappe_doc' || item.mime_type === 'frappe_whiteboard') {
+        console.log(`Skipping unsupported Drive item: ${item.title} (${item.mime_type})`)
+        continue
+      }
       const relativePath = currentPath ? `${currentPath}/${item.title}` : item.title
 
       if (item.is_group) {

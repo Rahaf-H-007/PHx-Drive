@@ -3,7 +3,7 @@ import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { clearMetadata } from './db/metadata'
 import { syncFolder } from './sync'
-import { startWatcher, stopWatcher } from './sync-file-watcher'
+import { startAutoSync, stopAutoSync } from './sync-file-watcher'
 const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
 
 export function registerSettingsHandlers(ipcMain) {
@@ -24,7 +24,7 @@ export function registerSettingsHandlers(ipcMain) {
     try {
       const previousSettings = loadSettings()
 
-      const syncFolderChanged = previousSettings.syncFolder !== settings.syncFolder
+      const syncFolderChanged = previousSettings?.syncFolder !== settings.syncFolder
 
       if (syncFolderChanged) {
         clearMetadata()
@@ -33,19 +33,19 @@ export function registerSettingsHandlers(ipcMain) {
       saveSettings(settings)
 
       console.log({
-        previous: previousSettings.syncFolder,
+        previous: previousSettings?.syncFolder,
         current: settings.syncFolder,
         changed: syncFolderChanged
       })
-      // Populate the new sync folder from Frappe before starting the watcher
+
       if (syncFolderChanged) {
         await syncFolder(settings.syncFolder, 'initialDownload')
       }
 
-      await stopWatcher()
+      stopAutoSync()
 
       if (settings.syncMode === 'automatic') {
-        startWatcher(settings.syncFolder)
+        startAutoSync(settings.syncFolder)
       }
 
       return {
@@ -70,9 +70,15 @@ export function registerSettingsHandlers(ipcMain) {
       }
     }
   })
+
+  // resume auto sync if it was enabled the last time the app was open
+  const settings = loadSettings()
+  if (settings?.syncMode === 'automatic' && settings?.syncFolder) {
+    startAutoSync(settings.syncFolder)
+  }
 }
 
-function saveSettings(settings) {
+export function saveSettings(settings) {
   const json = JSON.stringify(settings)
 
   const encrypted = safeStorage.encryptString(json)
