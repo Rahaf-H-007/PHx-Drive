@@ -44,7 +44,7 @@ export function registerFileHandlers(ipcMain) {
         },
         httpsAgent: new https.Agent({ rejectUnauthorized: false })
       })
-      console.log(response.data.message)
+      // console.log(response.data.message)
       return { success: true, message: response.data.message }
     } catch (err) {
       return { success: false, error: err.message }

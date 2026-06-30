@@ -47,7 +47,6 @@ export function compareSnapshots(localFiles, remoteFiles, dbFiles, mode = 'norma
         operations.push({ type: 'reupload', local, remote })
       }
     }
-
-    return operations
   }
+  return operations
 }

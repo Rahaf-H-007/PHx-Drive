@@ -7,7 +7,11 @@ let syncTimer
 export function startWatcher(syncFolderPath) {
   watcher = chokidar.watch(syncFolderPath, {
     ignoreInitial: true,
-    persistent: true
+    persistent: true,
+    awaitWriteFinish: {
+      stabilityThreshold: 1000,
+      pollInterval: 100
+    }
   })
   console.log('Watching:', syncFolderPath)
 

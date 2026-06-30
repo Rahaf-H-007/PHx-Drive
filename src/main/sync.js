@@ -1,6 +1,13 @@
 import { getAllFiles } from './db/metadata'
 import { loadSettings } from './settings'
-import { deleteRemoteItem, downloadItem, keepLocalItem, trackItem, uploadItem } from './sync-crud'
+import {
+  deleteRemoteItem,
+  downloadItem,
+  keepLocalItem,
+  reuploadItem,
+  trackItem,
+  uploadItem
+} from './sync-crud'
 import { compareSnapshots } from './sync-diff'
 import { scanLocal, scanRemote } from './sync-scanner'
 
@@ -50,6 +57,9 @@ export async function syncFolder(syncFolderPath, mode = 'normal') {
 
       case 'keepLocal':
         await keepLocalItem(operation.local)
+        break
+      case 'reupload':
+        await reuploadItem(operation.local, operation.remote, syncFolderPath)
         break
 
       default:

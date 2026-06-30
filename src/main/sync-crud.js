@@ -173,3 +173,20 @@ export async function keepLocalItem(local) {
 
   console.log(`Stopped tracking: ${local.path}`)
 }
+
+//this is for edits done locally
+//theres no direct edit endpoint on frappe
+//so i chose to make it delete then reupload
+export async function reuploadItem(local, remote, syncFolderPath) {
+  await axios.post(
+    `${BASE_URL}/method/drive.api.files.remove_or_restore`,
+    { entity_names: JSON.stringify([remote.remote_id]) },
+    {
+      headers: { Cookie: getCookieHeader() },
+      httpsAgent: new https.Agent({ rejectUnauthorized: false })
+    }
+  )
+
+  await uploadItem(local, syncFolderPath)
+  console.log(`Re-uploaded modified file: ${local.path}`)
+}
