@@ -2,7 +2,7 @@ import { app, dialog, safeStorage } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { clearMetadata } from './db/metadata'
-import { syncFolder } from './sync'
+import { syncFolder, waitForSyncToFinish } from './sync'
 import { startAutoSync, stopAutoSync } from './sync-file-watcher'
 const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
 
@@ -23,8 +23,12 @@ export function registerSettingsHandlers(ipcMain) {
   ipcMain.handle('settings:save', async (_, settings) => {
     try {
       const previousSettings = loadSettings()
-
       const syncFolderChanged = previousSettings?.syncFolder !== settings.syncFolder
+
+      // no new polls
+      stopAutoSync()
+      // finish whatever's currently running before touching metadata
+      await waitForSyncToFinish()
 
       if (syncFolderChanged) {
         clearMetadata()
@@ -41,8 +45,6 @@ export function registerSettingsHandlers(ipcMain) {
       if (syncFolderChanged) {
         await syncFolder(settings.syncFolder, 'initialDownload')
       }
-
-      stopAutoSync()
 
       if (settings.syncMode === 'automatic') {
         startAutoSync(settings.syncFolder)
@@ -71,7 +73,6 @@ export function registerSettingsHandlers(ipcMain) {
     }
   })
 
-  // resume auto sync if it was enabled the last time the app was open
   const settings = loadSettings()
   if (settings?.syncMode === 'automatic' && settings?.syncFolder) {
     startAutoSync(settings.syncFolder)
