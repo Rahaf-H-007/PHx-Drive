@@ -37,11 +37,10 @@ export function compareSnapshots(localFiles, remoteFiles, dbFiles, mode = 'norma
         db
       })
     } else if (local && !remote && db) {
-      operations.push({
-        type: 'keepLocal',
-        local,
-        db
-      })
+      // if its not flagged flag it otherwise do nothing
+      if (db.state !== 'remote_deleted') {
+        operations.push({ type: 'keepLocal', local, db })
+      }
     } else if (local && remote && db) {
       if (local.type === 'file' && local.content_hash !== db.content_hash) {
         operations.push({ type: 'reupload', local, remote })

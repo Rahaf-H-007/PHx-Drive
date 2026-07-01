@@ -65,7 +65,7 @@ async function runSync(syncFolderPath, mode) {
         await deleteRemoteItem(operation.remote)
         break
       case 'keepLocal':
-        await keepLocalItem(operation.local)
+        await keepLocalItem(operation.local, operation.db)
         break
       case 'reupload':
         await reuploadItem(operation.local, operation.remote, syncFolderPath)

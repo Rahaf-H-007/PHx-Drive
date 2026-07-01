@@ -175,8 +175,15 @@ export async function deleteRemoteItem(remote) {
   console.log(`Moved to remote trash: ${remote.path}`)
 }
 
-export async function keepLocalItem(local) {
-  deleteFile(local.path)
+export async function keepLocalItem(local, db) {
+  updateFile({
+    path: db.path,
+    content_hash: db.content_hash,
+    size: db.size,
+    remote_id: db.remote_id,
+    state: 'remote_deleted',
+    last_synced_at: Date.now()
+  })
 
   console.log(`Stopped tracking: ${local.path}`)
 }

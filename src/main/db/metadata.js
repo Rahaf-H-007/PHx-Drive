@@ -12,7 +12,7 @@ db.exec(`
     content_hash TEXT,
     size INTEGER,
     remote_id TEXT,
-    state TEXT NOT NULL DEFAULT 'pending' CHECK(state IN ('synced', 'pending', 'conflict', 'error')),
+    state TEXT NOT NULL DEFAULT 'pending' CHECK(state IN ('synced', 'pending', 'conflict', 'error', 'remote_deleted')),
     last_synced_at INTEGER
   )
 `)
@@ -48,3 +48,5 @@ export const getRemoteId = (path) =>
 export function clearMetadata() {
   db.prepare('DELETE FROM metadata').run()
 }
+export const getRemoteDeletedFiles = () =>
+  db.prepare("SELECT * FROM metadata WHERE state = 'remote_deleted'").all()
