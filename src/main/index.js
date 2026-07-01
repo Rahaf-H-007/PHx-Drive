@@ -7,7 +7,7 @@ import { registerSettingsHandlers } from './settings'
 import { registerSyncHandlers } from './sync'
 
 function createWindow() {
-  console.log(typeof FormData)
+  // console.log(typeof FormData)
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
