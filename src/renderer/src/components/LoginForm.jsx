@@ -30,7 +30,7 @@ export default function LoginForm() {
       }
 
       setUser({ user: result.user, owner: result.owner })
-      navigate('/', { replace: true })
+      navigate('/settings', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {
