@@ -8,7 +8,9 @@ export default function Home() {
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
     >
       <Sidebar />
-      <Outlet />
+      <div className="flex-1 min-w-0 overflow-auto">
+        <Outlet />
+      </div>
     </div>
   )
 }
