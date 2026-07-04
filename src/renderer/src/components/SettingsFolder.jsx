@@ -2,7 +2,6 @@
 import { FolderIcon } from '@heroicons/react/24/outline'
 import SettingsCard from './SettingsCard'
 
-//TODO:handle folder (later)
 export default function SettingsFolder({ folderPath, onFolderChange }) {
   const handleBrowse = async () => {
     const path = await window.api.selectSyncFolder()

@@ -4,6 +4,7 @@ import SettingsFolder from './SettingsFolder'
 import SettingsSyncMode from './SettingsSyncMode'
 import SettingsSignOut from './SettingsSignOut'
 import PageHeader from './PageHeader'
+import SettingsLinks from './SettingsLinks'
 
 export default function Settings() {
   const [settings, setSettings] = useState({
@@ -65,7 +66,7 @@ export default function Settings() {
         >
           Save changes
         </button>
-
+        <SettingsLinks />
         <SettingsSignOut />
       </div>
     </main>

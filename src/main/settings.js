@@ -4,7 +4,11 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { clearMetadata } from './db/metadata'
 import { syncFolder, waitForSyncToFinish } from './sync'
 import { startAutoSync, stopAutoSync } from './sync-file-watcher'
+import { shell } from 'electron'
+
 const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
+const HOWTO_GUIDE_URL = import.meta.env.MAIN_VITE_HOWTO_GUIDE_URL
+const DRIVE_WEB = import.meta.env.MAIN_VITE_DRIVE_HOME
 
 export function registerSettingsHandlers(ipcMain) {
   ipcMain.handle('sync-folder:select', async () => {
@@ -77,6 +81,14 @@ export function registerSettingsHandlers(ipcMain) {
   if (settings?.syncMode === 'automatic' && settings?.syncFolder) {
     startAutoSync(settings.syncFolder)
   }
+
+  ipcMain.handle('links:open-guide', () => {
+    shell.openExternal(HOWTO_GUIDE_URL)
+  })
+
+  ipcMain.handle('links:open-web-app', () => {
+    shell.openExternal(`${DRIVE_WEB}`)
+  })
 }
 
 export function saveSettings(settings) {

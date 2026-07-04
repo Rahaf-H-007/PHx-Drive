@@ -27,7 +27,7 @@ export default function NavItem({ item, active, collapsed }) {
       )}
 
       {/* active state */}
-      {!collapsed && active && <span className="w-3.5 h-3.5 text-red-400 shrink-0"></span>}
+      {!collapsed && active && <span className="text-red-400 shrink-0"></span>}
     </button>
   )
 }
