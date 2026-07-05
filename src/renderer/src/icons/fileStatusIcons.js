@@ -5,25 +5,24 @@ import {
   ExclamationCircleIcon
 } from '@heroicons/react/24/outline'
 
-export const fileStatusIcons = {
+export const STATUS_CONFIG = {
   synced: {
-    StatusIcon: CheckCircleIcon,
-    statusIconClass: 'text-green-500',
-    statusTextClass: 'text-green-600'
+    Icon: CheckCircleIcon,
+    bg: 'bg-green-100',
+    color: 'text-green-500',
+    label: 'All files up to date'
   },
-  syncing: {
-    StatusIcon: ArrowPathIcon,
-    statusIconClass: 'text-orange-500 animate-spin',
-    statusTextClass: 'text-orange-600'
-  },
+  pending: { Icon: ArrowPathIcon, bg: 'bg-blue-100', color: 'text-blue-500', label: 'Syncing...' },
   conflict: {
-    StatusIcon: ExclamationTriangleIcon,
-    statusIconClass: 'text-yellow-500',
-    statusTextClass: 'text-yellow-600'
+    Icon: ExclamationTriangleIcon,
+    bg: 'bg-yellow-100',
+    color: 'text-yellow-500',
+    label: 'Conflicts detected'
   },
   error: {
-    StatusIcon: ExclamationCircleIcon,
-    statusIconClass: 'text-red-500',
-    statusTextClass: 'text-red-600'
+    Icon: ExclamationCircleIcon,
+    bg: 'bg-red-100',
+    color: 'text-red-500',
+    label: 'Sync error'
   }
 }

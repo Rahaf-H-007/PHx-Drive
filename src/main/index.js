@@ -5,11 +5,14 @@ import { initSession, registerAuthHandlers } from './auth'
 import { registerFileHandlers } from './files'
 import { registerSettingsHandlers } from './settings'
 import { registerSyncHandlers } from './sync'
+import { setMainWindow } from './db/activityLog'
+import { registerActivityLogHandlers } from './activity'
 
+let mainWindow
 function createWindow() {
   // console.log(typeof FormData)
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 950,
@@ -62,6 +65,10 @@ app.whenReady().then(() => {
   registerSettingsHandlers(ipcMain)
 
   registerSyncHandlers(ipcMain)
+
+  registerActivityLogHandlers(ipcMain)
+
+  setMainWindow(mainWindow)
 })
 
 //TODO: uncomment when done

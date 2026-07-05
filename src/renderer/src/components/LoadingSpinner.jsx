@@ -1,9 +1,7 @@
-import { ArrowPathIcon } from '@heroicons/react/24/outline'
-
 export default function LoadingSpinner() {
   return (
-    <div className="flex h-72 items-center justify-center">
-      <ArrowPathIcon className="h-8 w-8 animate-spin text-[#b31313]" />
+    <div className="flex h-16 items-center justify-center">
+      <span className="loading loading-spinner loading-xl text-[#b31313]"></span>
     </div>
   )
 }

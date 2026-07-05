@@ -3,8 +3,9 @@ import path from 'path'
 import { app } from 'electron'
 
 // create db file if it doesnt exist
-const db = new Database(path.join(app.getPath('userData'), 'metadata.db'))
+export const db = new Database(path.join(app.getPath('userData'), 'metadata.db'))
 
+//metadata table
 db.exec(`
   CREATE TABLE IF NOT EXISTS metadata (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,12 +18,18 @@ db.exec(`
   )
 `)
 
+//reminder for me
 // use named parameters so that @path matches with path in the object isnide .run
 //what this means:
 // insert this row. If a row with this path already exists,
 // don't insert a duplicate and instead take the existing row
 // and overwrite its content_hash, size, remote_id, , state, and last_synced_at
 // with the new values.
+//.prepare() - compiles sql into a reusable statement object that we can execute later
+//.get() - executes the statement and returns one row
+//.all() - executes the statement and returns all matching rows
+//.run() - executes for statements that don't return rows(INSERT UPDATE DELETE)
+//and parameters are values that will be used for placeholders
 export function updateFile({ path, content_hash, size, remote_id, state, last_synced_at }) {
   db.prepare(
     `

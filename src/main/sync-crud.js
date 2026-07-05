@@ -7,6 +7,7 @@ import { getHomeId } from './files'
 import { getCookieHeader } from './auth'
 import { randomUUID } from 'crypto'
 import { hashFile } from './sync-scanner'
+import { logActivity } from './db/activityLog'
 
 const BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
 
@@ -41,6 +42,7 @@ export async function uploadItem(item, syncFolderPath) {
       state: 'synced',
       last_synced_at: Date.now()
     })
+    logActivity({ event_type: 'folder_created', path: item.path })
 
     console.log(`Created remote folder: ${item.path}`)
     return
@@ -77,6 +79,7 @@ export async function uploadItem(item, syncFolderPath) {
     state: 'synced',
     last_synced_at: Date.now()
   })
+  logActivity({ event_type: 'uploaded', path: item.path, size: item.size })
 
   console.log(`Uploaded file: ${item.path}`)
 }
@@ -96,6 +99,7 @@ export async function downloadItem(item, syncFolderPath) {
       state: 'synced',
       last_synced_at: Date.now()
     })
+    logActivity({ event_type: 'folder_created', path: item.path })
 
     console.log(`Created directory: ${item.path}`)
     return
@@ -131,10 +135,12 @@ export async function downloadItem(item, syncFolderPath) {
       state: 'synced',
       last_synced_at: Date.now()
     })
+    logActivity({ event_type: 'downloaded', path: item.path, size: item.size })
 
     console.log('Downloaded:', item.path)
     console.log(localPath)
   } catch (err) {
+    logActivity({ event_type: 'error', path: item.path })
     console.error('Download failed')
     console.error('item:', item)
     console.log(err.message)
@@ -171,6 +177,7 @@ export async function deleteRemoteItem(remote) {
   )
 
   deleteFile(remote.path)
+  logActivity({ event_type: 'deleted', path: remote.path })
 
   console.log(`Moved to remote trash: ${remote.path}`)
 }
