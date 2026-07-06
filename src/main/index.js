@@ -64,7 +64,7 @@ app.whenReady().then(() => {
 
   registerSettingsHandlers(ipcMain)
 
-  registerSyncHandlers(ipcMain)
+  registerSyncHandlers(ipcMain, mainWindow)
 
   registerActivityLogHandlers(ipcMain)
 

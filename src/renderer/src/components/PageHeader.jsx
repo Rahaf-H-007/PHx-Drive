@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import { ArrowPathIcon, ChevronDownIcon, WifiIcon } from '@heroicons/react/24/solid'
+import { ArrowPathIcon, WifiIcon } from '@heroicons/react/24/solid'
 
-export default function PageHeader({ children }) {
+export default function PageHeader({ children, isSyncing }) {
   return (
     <header
       className="flex items-center justify-between px-8 h-18 bg-white
@@ -15,9 +15,10 @@ export default function PageHeader({ children }) {
               border-green-200 rounded-full"
       >
         <WifiIcon className="w-3.5 h-3.5 text-green-600" />
-        <span className="text-xs font-medium text-green-700">Online. Syncing</span>
-        <ArrowPathIcon className="w-3 h-3 text-green-600" />
-        <ChevronDownIcon className="w-3 h-3 text-green-500" />
+        <span className="text-xs font-medium text-green-700">
+          Online{isSyncing ? '. Syncing' : ''}
+        </span>
+        {isSyncing && <ArrowPathIcon className="w-3 h-3 text-green-600 animate-spin" />}
       </div>
     </header>
   )

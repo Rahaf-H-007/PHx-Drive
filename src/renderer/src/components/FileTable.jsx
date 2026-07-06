@@ -4,30 +4,51 @@ import FileRow from './FileRow'
 import LoadingSpinner from './LoadingSpinner'
 import EmptyFiles from './EmptyFiles'
 
-export default function FileTable({ search }) {
+export default function FileTable({ search, syncTick }) {
   const [files, setFiles] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [refetchTick, setRefetchTick] = useState(0)
+
   useEffect(() => {
+    let cancelled = false
     async function loadFiles() {
       try {
-        setIsLoading(true)
-
         const result = await window.api.getFiles()
-
+        if (cancelled) return
         if (result.success) {
           setFiles(result.message)
         } else {
           throw new Error(result.error || 'Failed to load files')
         }
       } catch (err) {
-        setError(err.message)
+        if (!cancelled) setError(err.message)
       } finally {
-        setIsLoading(false)
+        if (!cancelled) setIsLoading(false)
       }
     }
-
     loadFiles()
+    return () => {
+      cancelled = true
+    }
+  }, [syncTick, refetchTick])
+
+  useEffect(() => {
+    const handler = (payload) => {
+      if (!payload?.remote_id) return
+      setFiles((prev) => {
+        const exists = prev.some((f) => f.name === payload.remote_id)
+        if (!exists) {
+          // File not in the list yet (new download)so  pull it from the DB.
+
+          setRefetchTick((t) => t + 1)
+          return prev
+        }
+        return prev.map((f) => (f.name === payload.remote_id ? { ...f, state: payload.state } : f))
+      })
+    }
+    const cleanup = window.api.onFileStateUpdate(handler)
+    return cleanup
   }, [])
 
   const filteredFiles = files.filter((file) => {

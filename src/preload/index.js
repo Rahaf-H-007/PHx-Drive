@@ -19,7 +19,20 @@ const api = {
   getRecentActivity: () => ipcRenderer.invoke('activity:get-recent'),
   getSyncStatus: () => ipcRenderer.invoke('activity:get-status'),
   onSyncUpdate: (cb) => ipcRenderer.on('sync:updated', cb),
-  offSyncUpdate: (cb) => ipcRenderer.removeListener('sync:updated', cb)
+  offSyncUpdate: (cb) => ipcRenderer.removeListener('sync:updated', cb),
+  getStorageQuota: () => ipcRenderer.invoke('storage:get-quota'),
+  onQuotaExceeded: (cb) => ipcRenderer.on('sync:quota-exceeded', cb),
+  offQuotaExceeded: (cb) => ipcRenderer.removeListener('sync:quota-exceeded', cb),
+  onSyncStatus: (cb) => {
+    const listener = (_, payload) => cb(payload)
+    ipcRenderer.on('sync:status', listener)
+    return () => ipcRenderer.removeListener('sync:status', listener)
+  },
+  onFileStateUpdate: (cb) => {
+    const listener = (_, payload) => cb(payload)
+    ipcRenderer.on('sync:file-state', listener)
+    return () => ipcRenderer.removeListener('sync:file-state', listener)
+  }
 }
 
 try {

@@ -10,8 +10,13 @@ import { hashFile } from './sync-scanner'
 import { logActivity } from './db/activityLog'
 
 const BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
+// this is to send to the renderer using webContents.send
+let _notify = () => {}
+export function setNotifier(fn) {
+  _notify = fn
+}
 
-export async function uploadItem(item, syncFolderPath) {
+export async function uploadItem(item, syncFolderPath, { setPending = true } = {}) {
   const parentPath = dirname(item.path)
 
   const parent = parentPath === '.' ? await getHomeId() : getRemoteId(parentPath)
@@ -48,6 +53,19 @@ export async function uploadItem(item, syncFolderPath) {
     return
   }
 
+  // mark pending in db and push to renderer before any io starts
+  if (setPending) {
+    updateFile({
+      path: item.path,
+      content_hash: item.content_hash,
+      size: item.size,
+      remote_id: null,
+      state: 'pending',
+      last_synced_at: Date.now()
+    })
+    _notify({ path: item.path, state: 'pending' })
+  }
+
   const bytes = await readFile(join(syncFolderPath, item.path))
 
   const form = new FormData()
@@ -71,14 +89,17 @@ export async function uploadItem(item, syncFolderPath) {
     })
   })
 
+  const newRemoteId = response.data.message.name
+
   updateFile({
     path: item.path,
     content_hash: item.content_hash,
     size: item.size,
-    remote_id: response.data.message.name,
+    remote_id: newRemoteId,
     state: 'synced',
     last_synced_at: Date.now()
   })
+  _notify({ remote_id: newRemoteId, state: 'synced' })
   logActivity({ event_type: 'uploaded', path: item.path, size: item.size })
 
   console.log(`Uploaded file: ${item.path}`)
@@ -105,8 +126,18 @@ export async function downloadItem(item, syncFolderPath) {
     return
   }
 
-  // Ensure parent directory exists
+  // parent directory exists
   await mkdir(dirname(localPath), { recursive: true })
+
+  updateFile({
+    path: item.path,
+    content_hash: null,
+    size: item.size,
+    remote_id: item.remote_id,
+    state: 'pending',
+    last_synced_at: Date.now()
+  })
+  _notify({ remote_id: item.remote_id, state: 'pending' })
 
   try {
     const response = await axios.get(`${BASE_URL}/method/drive.api.files.get_file_content`, {
@@ -135,15 +166,23 @@ export async function downloadItem(item, syncFolderPath) {
       state: 'synced',
       last_synced_at: Date.now()
     })
+    _notify({ remote_id: item.remote_id, state: 'synced' })
     logActivity({ event_type: 'downloaded', path: item.path, size: item.size })
 
     console.log('Downloaded:', item.path)
     console.log(localPath)
   } catch (err) {
+    updateFile({
+      path: item.path,
+      content_hash: null,
+      size: item.size,
+      remote_id: item.remote_id,
+      state: 'error',
+      last_synced_at: Date.now()
+    })
+    _notify({ remote_id: item.remote_id, state: 'error' })
     logActivity({ event_type: 'error', path: item.path })
-    console.error('Download failed')
-    console.error('item:', item)
-    console.log(err.message)
+    console.error('Download failed', item, err.message)
   }
 }
 
@@ -199,6 +238,15 @@ export async function keepLocalItem(local, db) {
 //theres no direct edit endpoint on frappe
 //so i chose to make it delete then reupload
 export async function reuploadItem(local, remote, syncFolderPath) {
+  updateFile({
+    path: local.path,
+    content_hash: local.content_hash,
+    size: local.size,
+    remote_id: remote.remote_id,
+    state: 'pending',
+    last_synced_at: Date.now()
+  })
+  _notify({ remote_id: remote.remote_id, state: 'pending' })
   await axios.post(
     `${BASE_URL}/method/drive.api.files.remove_or_restore`,
     { entity_names: JSON.stringify([remote.remote_id]) },
@@ -208,6 +256,6 @@ export async function reuploadItem(local, remote, syncFolderPath) {
     }
   )
 
-  await uploadItem(local, syncFolderPath)
+  await uploadItem(local, syncFolderPath, { setPending: false })
   console.log(`Re-uploaded modified file: ${local.path}`)
 }
