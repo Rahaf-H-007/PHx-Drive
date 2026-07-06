@@ -1,5 +1,5 @@
 import { updateFile, getRemoteId, deleteFile } from './db/metadata'
-import { mkdir, writeFile, readFile } from 'fs/promises'
+import { mkdir, writeFile, readFile, rm } from 'fs/promises'
 import { join, dirname, basename } from 'path'
 import axios from 'axios'
 import https from 'https'
@@ -221,22 +221,20 @@ export async function deleteRemoteItem(remote) {
   console.log(`Moved to remote trash: ${remote.path}`)
 }
 
-export async function keepLocalItem(local, db) {
-  updateFile({
-    path: db.path,
-    content_hash: db.content_hash,
-    size: db.size,
-    remote_id: db.remote_id,
-    state: 'remote_deleted',
-    last_synced_at: Date.now()
-  })
+export async function deleteLocalItem(local, syncFolderPath) {
+  const fullPath = join(syncFolderPath, local.path)
+  try {
+    await rm(fullPath, { recursive: true, force: true })
+  } catch (err) {
+    // if "no such file/directory" then dont block sync
+    if (err.code !== 'ENOENT') throw err
+  }
 
-  console.log(`Stopped tracking: ${local.path}`)
+  deleteFile(local.path)
+  logActivity({ event_type: 'deleted', path: local.path })
+  console.log(`Deleted locally: ${local.path}`)
 }
 
-//this is for edits done locally
-//theres no direct edit endpoint on frappe
-//so i chose to make it delete then reupload
 export async function reuploadItem(local, remote, syncFolderPath) {
   updateFile({
     path: local.path,

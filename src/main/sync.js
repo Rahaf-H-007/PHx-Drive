@@ -1,9 +1,9 @@
 import { getAllFiles } from './db/metadata'
 import { loadSettings } from './settings'
 import {
+  deleteLocalItem,
   deleteRemoteItem,
   downloadItem,
-  keepLocalItem,
   reuploadItem,
   setNotifier,
   trackItem,
@@ -169,8 +169,8 @@ async function runSync(syncFolderPath, mode) {
           adjustQuotaCache(-freed)
         }
         break
-      case 'keepLocal':
-        await keepLocalItem(operation.local, operation.db)
+      case 'deleteLocal':
+        await deleteLocalItem(operation.local, syncFolderPath)
         break
       case 'reupload':
         await reuploadItem(operation.local, operation.remote, syncFolderPath)
