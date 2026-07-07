@@ -7,10 +7,12 @@ import { registerSettingsHandlers } from './settings'
 import { registerSyncHandlers } from './sync'
 import { setMainWindow } from './db/activityLog'
 import { registerActivityLogHandlers } from './activity'
+import { createTray, destroyTray, setTrayState } from './tray'
+
+let isQuitting = false
 
 let mainWindow
 function createWindow() {
-  // console.log(typeof FormData)
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -22,11 +24,20 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js')
       //       sandbox: false
-    }
+    },
+    icon: join(__dirname, '../../build/icon.ico')
   })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+  })
+
+  // minimize to tray on close
+  mainWindow.on('close', (e) => {
+    if (!isQuitting) {
+      e.preventDefault()
+      mainWindow.hide()
+    }
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -38,18 +49,12 @@ function createWindow() {
   }
 }
 
-//Electron extra config. TODO: uncomment when done
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   //Electron extra config. TODO: uncomment when done
   // Set app user model id for windows
   // electronApp.setAppUserModelId('com.electron')
-
   // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
+  // and ignore CommandOrControl + R in production
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
@@ -64,27 +69,40 @@ app.whenReady().then(() => {
 
   registerSettingsHandlers(ipcMain)
 
-  registerSyncHandlers(ipcMain, mainWindow)
+  registerSyncHandlers(ipcMain, mainWindow, {
+    onSyncStatus: ({ syncing, error }) => {
+      if (syncing) setTrayState('syncing')
+      else if (error) setTrayState('error')
+      else setTrayState('idle')
+    }
+  })
 
   registerActivityLogHandlers(ipcMain)
 
   setMainWindow(mainWindow)
+
+  createTray(mainWindow, {
+    onShowSettings: () => {
+      if (!mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('app:navigate', '/settings')
+      }
+    }
+  })
 })
 
-//TODO: uncomment when done
-//extra config by electron
-//   app.on('activate', function () {
-//     // On macOS it's common to re-create a window in the app when the
-//     // dock icon is clicked and there are no other windows open.
-//     if (BrowserWindow.getAllWindows().length === 0) createWindow()
-//   })
-// })
+app.on('window-all-closed', () => {
+  // empty so that the tray keeps running
+})
 
-// // Quit when all windows are closed, except on macOS. There, it's common
-// // for applications and their menu bar to stay active until the user quits
-// // explicitly with Cmd + Q.
-// app.on('window-all-closed', () => {
-//   if (process.platform !== 'darwin') {
-//     app.quit()
-//   }
-// })
+//for macOS
+app.on('activate', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.show()
+    mainWindow.focus()
+  }
+})
+
+app.on('before-quit', () => {
+  isQuitting = true
+  destroyTray()
+})

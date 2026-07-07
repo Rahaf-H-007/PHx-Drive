@@ -7,11 +7,13 @@ import PublicRoute from './components/PublicRoute'
 import MenuFiles from './components/MenuFiles'
 import SyncActivity from './components/SyncActivity'
 import Settings from './components/Settings'
+import { TrayNavigationListener } from './components/TrayNavigationListener'
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <TrayNavigationListener />
         <Routes>
           <Route
             path="/"

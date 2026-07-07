@@ -32,6 +32,11 @@ const api = {
     const listener = (_, payload) => cb(payload)
     ipcRenderer.on('sync:file-state', listener)
     return () => ipcRenderer.removeListener('sync:file-state', listener)
+  },
+  onNavigate: (cb) => {
+    const listener = (_, path) => cb(path)
+    ipcRenderer.on('app:navigate', listener)
+    return () => ipcRenderer.removeListener('app:navigate', listener)
   }
 }
 

@@ -1,0 +1,39 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="1024"
+    height="1024"
+    viewBox="0 0 1024 1024">
+
+    <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#a31515"/>
+            <stop offset="100%" stop-color="#7b0f0f"/>
+        </linearGradient>
+
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="18" stdDeviation="24"
+                flood-color="#000000"
+                flood-opacity="0.25"/>
+        </filter>
+    </defs>
+
+    <rect
+        x="96"
+        y="96"
+        width="832"
+        height="832"
+        rx="180"
+        fill="url(#bg)"
+        filter="url(#shadow)" />
+
+    <text
+        x="512"
+        y="570"
+        text-anchor="middle"
+        font-family="Inter, Segoe UI, Arial, sans-serif"
+        font-size="320"
+        font-weight="700"
+        fill="white">
+        Px
+    </text>
+</svg>

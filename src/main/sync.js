@@ -21,12 +21,13 @@ import { logActivity } from './db/activityLog'
 
 let syncPromise = null
 let _statusNotifier = () => {}
+let _syncHadError = false
 
 export function setSyncStatusNotifier(fn) {
   _statusNotifier = fn
 }
 
-export async function registerSyncHandlers(ipcMain, mainWindow) {
+export async function registerSyncHandlers(ipcMain, mainWindow, { onSyncStatus } = {}) {
   registerStorageHandlers(ipcMain)
 
   // set once at startup
@@ -38,12 +39,17 @@ export async function registerSyncHandlers(ipcMain, mainWindow) {
 
   setSyncStatusNotifier((payload) => {
     if (!mainWindow.isDestroyed()) mainWindow.webContents.send('sync:status', payload)
+    onSyncStatus?.(payload)
   })
 
   ipcMain.handle('sync:manual', async () => {
     const settings = await loadSettings()
-    await syncFolder(settings.syncFolder)
-    return { success: true }
+    try {
+      await syncFolder(settings.syncFolder)
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
   })
 }
 
@@ -53,12 +59,18 @@ export function syncFolder(syncFolderPath, mode = 'normal') {
     return syncPromise
   }
 
-  _statusNotifier({ syncing: true })
+  _syncHadError = false
+  _statusNotifier({ syncing: true, error: false })
 
-  syncPromise = runSync(syncFolderPath, mode).finally(() => {
-    syncPromise = null
-    _statusNotifier({ syncing: false })
-  })
+  syncPromise = runSync(syncFolderPath, mode)
+    .catch((err) => {
+      _syncHadError = true
+      throw err
+    })
+    .finally(() => {
+      syncPromise = null
+      _statusNotifier({ syncing: false, error: _syncHadError })
+    })
 
   return syncPromise
 }
