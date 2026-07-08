@@ -37,7 +37,8 @@ const api = {
     const listener = (_, path) => cb(path)
     ipcRenderer.on('app:navigate', listener)
     return () => ipcRenderer.removeListener('app:navigate', listener)
-  }
+  },
+  downloadFile: (remoteId) => ipcRenderer.invoke('sync:download-file', remoteId)
 }
 
 try {

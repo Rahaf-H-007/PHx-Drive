@@ -2,7 +2,8 @@ import {
   CheckCircleIcon,
   ArrowPathIcon,
   ExclamationTriangleIcon,
-  ExclamationCircleIcon
+  ExclamationCircleIcon,
+  CloudArrowDownIcon
 } from '@heroicons/react/24/outline'
 
 export const STATUS_CONFIG = {
@@ -10,7 +11,7 @@ export const STATUS_CONFIG = {
     Icon: CheckCircleIcon,
     bg: 'bg-green-100',
     color: 'text-green-500',
-    label: 'All files up to date'
+    label: 'Synced'
   },
   pending: { Icon: ArrowPathIcon, bg: 'bg-blue-100', color: 'text-blue-500', label: 'Syncing...' },
   conflict: {
@@ -24,5 +25,11 @@ export const STATUS_CONFIG = {
     bg: 'bg-red-100',
     color: 'text-red-500',
     label: 'Sync error'
+  },
+  online_only: {
+    Icon: CloudArrowDownIcon,
+    color: 'text-blue-400',
+    label: 'Online only',
+    clickable: true
   }
 }

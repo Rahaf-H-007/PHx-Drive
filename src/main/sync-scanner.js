@@ -39,6 +39,7 @@ export async function scanLocal(syncFolderPath) {
           type: 'file',
           size: info.size,
           lastModified: info.mtimeMs,
+          atime: info.atimeMs,
           content_hash: contentHash
         })
       }

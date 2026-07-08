@@ -20,16 +20,17 @@ export function compareSnapshots(localFiles, remoteFiles, dbFiles, mode = 'norma
         })
       }
     } else if (!local && remote && !db) {
-      operations.push({
-        type: 'download',
-        item: remote
-      })
+      if (remote.type === 'directory') {
+        operations.push({ type: 'download', item: remote })
+      } else {
+        operations.push({ type: 'create_placeholder', item: remote })
+      }
     } else if (local && remote && !db) {
-      operations.push({
-        type: 'track',
-        local,
-        remote
-      })
+      if (local.type === 'file' && local.size === 0 && (remote.size ?? 0) > 0) {
+        operations.push({ type: 'create_placeholder', item: remote })
+      } else {
+        operations.push({ type: 'track', local, remote })
+      }
     } else if (!local && remote && db) {
       operations.push({
         type: 'deleteRemote',
@@ -42,7 +43,18 @@ export function compareSnapshots(localFiles, remoteFiles, dbFiles, mode = 'norma
         operations.push({ type: 'deleteLocal', local, db })
       }
     } else if (local && remote && db) {
-      if (local.type === 'file' && local.content_hash !== db.content_hash) {
+      // detect placeholder even if DB state got out of sync ( after folder switch)
+      const isPlaceholder =
+        db.state === 'online_only' ||
+        (local.type === 'file' && local.size === 0 && (remote.size ?? 0) > 0)
+
+      if (isPlaceholder) {
+        if (db.state !== 'online_only') {
+          operations.push({ type: 'create_placeholder', item: remote })
+        } else if (local.atime && local.atime > db.last_synced_at) {
+          operations.push({ type: 'download', item: remote })
+        }
+      } else if (local.type === 'file' && local.content_hash !== db.content_hash) {
         operations.push({ type: 'reupload', local, remote })
       }
     }

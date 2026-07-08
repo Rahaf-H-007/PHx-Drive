@@ -5,7 +5,9 @@ import FileRowSize from './FileRowSize'
 import FileRowStatus from './FileRowStatus'
 export default function FileRow({ file, isLast }) {
   const { TypeIcon, typeIconClass } = getFileIcon(file)
-
+  async function handleDownload() {
+    await window.api.downloadFile(file.name)
+  }
   return (
     <tr
       className={`hover:bg-gray-50/60 transition-colors cursor-default
@@ -32,7 +34,7 @@ export default function FileRow({ file, isLast }) {
       <FileRowModifiedDate added={file.creation} />
 
       {/* Status */}
-      <FileRowStatus status={file.state} />
+      <FileRowStatus status={file.state} onDownload={handleDownload} />
     </tr>
   )
 }

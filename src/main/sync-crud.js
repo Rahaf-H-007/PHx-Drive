@@ -1,4 +1,11 @@
-import { updateFile, getRemoteId, deleteFile } from './db/metadata'
+import {
+  updateFile,
+  getRemoteId,
+  deleteFile,
+  getFile,
+  setState,
+  hasOnlineOnlyDescendants
+} from './db/metadata'
 import { mkdir, writeFile, readFile, rm } from 'fs/promises'
 import { join, dirname, basename } from 'path'
 import axios from 'axios'
@@ -129,6 +136,8 @@ export async function downloadItem(item, syncFolderPath) {
   // parent directory exists
   await mkdir(dirname(localPath), { recursive: true })
 
+  const prevState = getFile(item.path)?.state
+
   updateFile({
     path: item.path,
     content_hash: null,
@@ -141,21 +150,13 @@ export async function downloadItem(item, syncFolderPath) {
 
   try {
     const response = await axios.get(`${BASE_URL}/method/drive.api.files.get_file_content`, {
-      params: {
-        entity_name: item.remote_id,
-        trigger_download: 1
-      },
-      headers: {
-        Cookie: getCookieHeader()
-      },
+      params: { entity_name: item.remote_id, trigger_download: 1 },
+      headers: { Cookie: getCookieHeader() },
       responseType: 'arraybuffer',
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
+      httpsAgent: new https.Agent({ rejectUnauthorized: false })
     })
 
     await writeFile(localPath, response.data)
-
     const contentHash = await hashFile(localPath)
 
     updateFile({
@@ -166,23 +167,31 @@ export async function downloadItem(item, syncFolderPath) {
       state: 'synced',
       last_synced_at: Date.now()
     })
+
+    const parts = item.path.split('/')
+    for (let i = parts.length - 1; i >= 1; i--) {
+      const dirPath = parts.slice(0, i).join('/')
+      const dbDir = getFile(dirPath)
+      if (dbDir) setState(dirPath, hasOnlineOnlyDescendants(dirPath) ? 'online_only' : 'synced')
+    }
     _notify({ remote_id: item.remote_id, state: 'synced' })
     logActivity({ event_type: 'downloaded', path: item.path, size: item.size })
-
     console.log('Downloaded:', item.path)
-    console.log(localPath)
   } catch (err) {
     updateFile({
       path: item.path,
       content_hash: null,
       size: item.size,
       remote_id: item.remote_id,
-      state: 'error',
+      state: prevState === 'online_only' ? 'online_only' : 'error',
       last_synced_at: Date.now()
     })
-    _notify({ remote_id: item.remote_id, state: 'error' })
+    _notify({
+      remote_id: item.remote_id,
+      state: prevState === 'online_only' ? 'online_only' : 'error'
+    })
     logActivity({ event_type: 'error', path: item.path })
-    console.error('Download failed', item, err.message)
+    console.error('Download failed:', item.path, err.message)
   }
 }
 
@@ -256,4 +265,21 @@ export async function reuploadItem(local, remote, syncFolderPath) {
 
   await uploadItem(local, syncFolderPath, { setPending: false })
   console.log(`Re-uploaded modified file: ${local.path}`)
+}
+
+export async function createPlaceholder(item, syncFolderPath) {
+  const localPath = join(syncFolderPath, item.path)
+  await mkdir(dirname(localPath), { recursive: true })
+  await writeFile(localPath, Buffer.alloc(0))
+
+  updateFile({
+    path: item.path,
+    content_hash: null,
+    size: item.size,
+    remote_id: item.remote_id,
+    state: 'online_only',
+    last_synced_at: Date.now()
+  })
+  _notify({ remote_id: item.remote_id, state: 'online_only' })
+  console.log('Created placeholder:', item.path)
 }

@@ -1,6 +1,14 @@
-import { getAllFiles } from './db/metadata'
+import {
+  getAllFiles,
+  getFile,
+  getFileByRemoteId,
+  getOnlineOnlyDescendants,
+  getOnlineOnlyFiles,
+  setState
+} from './db/metadata'
 import { loadSettings } from './settings'
 import {
+  createPlaceholder,
   deleteLocalItem,
   deleteRemoteItem,
   downloadItem,
@@ -46,6 +54,37 @@ export async function registerSyncHandlers(ipcMain, mainWindow, { onSyncStatus }
     const settings = await loadSettings()
     try {
       await syncFolder(settings.syncFolder)
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
+  })
+
+  ipcMain.handle('sync:download-file', async (_, remoteId) => {
+    const settings = await loadSettings()
+    const dbFile = getFileByRemoteId(remoteId)
+    if (!dbFile || dbFile.state !== 'online_only') {
+      return { success: false, error: 'Not an online-only file' }
+    }
+
+    try {
+      const descendants = getOnlineOnlyDescendants(dbFile.path)
+
+      if (descendants.length > 0) {
+        for (const child of descendants) {
+          if (child.size !== null) {
+            await downloadItem(
+              { path: child.path, remote_id: child.remote_id, size: child.size, type: 'file' },
+              settings.syncFolder
+            )
+          }
+        }
+      } else {
+        await downloadItem(
+          { path: dbFile.path, remote_id: dbFile.remote_id, size: dbFile.size, type: 'file' },
+          settings.syncFolder
+        )
+      }
       return { success: true }
     } catch (err) {
       return { success: false, error: err.message }
@@ -192,9 +231,24 @@ async function runSync(syncFolderPath, mode) {
           adjustQuotaCache(fileSize)
         }
         break
+      case 'create_placeholder':
+        await createPlaceholder(operation.item, syncFolderPath)
+        break
       default:
         console.warn(`Unknown operation: ${operation.type}`)
     }
+  }
+
+  const placeholders = getOnlineOnlyFiles()
+  const parentsToUpdate = new Set()
+  for (const f of placeholders) {
+    const parts = f.path.split('/')
+    for (let i = 1; i < parts.length; i++) {
+      parentsToUpdate.add(parts.slice(0, i).join('/'))
+    }
+  }
+  for (const dirPath of parentsToUpdate) {
+    if (getFile(dirPath)) setState(dirPath, 'online_only')
   }
 }
 
