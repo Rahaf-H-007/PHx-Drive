@@ -38,15 +38,13 @@ export default function LoginForm() {
     }
   }
   return (
-    <div className="mt-5 p-8 sm:mx-auto sm:w-full sm:max-w-sm border border-gray-100 rounded-md shadow-[0_8px_48px_rgba(0,0,0,0.1)]">
-      {/* first part */}
+    <div className="mt-5 p-8 sm:mx-auto sm:w-full sm:max-w-sm border border-base-200 rounded-md shadow-[0_8px_48px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_48px_rgba(255,255,255,0.06)]">
       <Logo />
-
       <LoginHeader />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+          <label htmlFor="email" className="block text-sm/6 font-medium text-base-content">
             Email address
           </label>
           <div className="mt-2">
@@ -59,14 +57,14 @@ export default function LoginForm() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#b31313] sm:text-sm/6"
+              className="block w-full rounded-md bg-base-100 px-3 py-1.5 text-base text-base-content outline-1 -outline-offset-1 outline-base-300 placeholder:text-base-content/40 focus:outline-2 focus:-outline-offset-2 focus:outline-[#b31313] sm:text-sm/6"
             />
           </div>
         </div>
 
         <div>
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+            <label htmlFor="password" className="block text-sm/6 font-medium text-base-content">
               Password
             </label>
           </div>
@@ -79,13 +77,12 @@ export default function LoginForm() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-md bg-white px-3 py-1.5 pr-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#b31313] sm:text-sm/6"
+              className="block w-full rounded-md bg-base-100 px-3 py-1.5 pr-10 text-base text-base-content outline-1 -outline-offset-1 outline-base-300 placeholder:text-base-content/40 focus:outline-2 focus:-outline-offset-2 focus:outline-[#b31313] sm:text-sm/6"
             />
-
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-base-content/50 hover:text-base-content/70"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? (
@@ -97,11 +94,9 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {/* button */}
         <LoginButton isLoading={isLoading} />
       </form>
 
-      {/* login demo line */}
       <LoginDemo />
       {error && <div className="mt-4 text-red-600">{error}</div>}
     </div>
