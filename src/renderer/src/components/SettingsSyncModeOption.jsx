@@ -7,7 +7,9 @@ export default function SettingsSyncModeOption({ mode, selected, onChange }) {
       htmlFor={mode.id}
       className={[
         'flex items-start gap-3.5 rounded-xl border px-4 py-3.5 cursor-pointer transition-colors',
-        isSelected ? 'border-[#8B1A1A] bg-[#FDF2F2]' : 'border-gray-200 bg-white hover:bg-gray-50'
+        isSelected
+          ? 'border-[#8B1A1A] bg-red-800/5'
+          : 'border-base-200 bg-base-100 hover:bg-base-200'
       ].join(' ')}
     >
       <input
@@ -24,7 +26,7 @@ export default function SettingsSyncModeOption({ mode, selected, onChange }) {
       <div
         className={[
           'mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors',
-          isSelected ? 'border-[#8B1A1A]' : 'border-gray-300'
+          isSelected ? 'border-[#8B1A1A]' : 'border-base-300'
         ].join(' ')}
         aria-hidden="true"
       >
@@ -34,14 +36,14 @@ export default function SettingsSyncModeOption({ mode, selected, onChange }) {
       {/* Label + description */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-semibold text-gray-900">{mode.label}</span>
+          <span className="text-sm font-semibold text-base-content">{mode.label}</span>
           {mode.isDefault && (
             <span className="bg-[#8B1A1A] inline-block text-xs font-semibold text-white rounded-md px-2 py-0.5 leading-tight">
               Default
             </span>
           )}
         </div>
-        <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">{mode.description}</p>
+        <p className="text-sm text-base-content/50 mt-0.5 leading-relaxed">{mode.description}</p>
       </div>
     </label>
   )
