@@ -105,6 +105,46 @@ export function registerAuthHandlers(ipcMain) {
     }
   })
 
+  ipcMain.handle('profile:get-avatar', async () => {
+    if (!cookieHeader) return null
+    const agent = new https.Agent({ rejectUnauthorized: false })
+    try {
+      const userId = decodeURIComponent(
+        cookieHeader
+          .split('; ')
+          .find((c) => c.startsWith('user_id='))
+          ?.split('=')[1] ?? ''
+      )
+      if (!userId) return null
+
+      const response = await axios.post(
+        `${BASE_URL}/method/frappe.client.get`,
+        { doctype: 'User', name: userId },
+        {
+          headers: { Cookie: cookieHeader },
+          httpsAgent: agent
+        }
+      )
+
+      const userImage = response.data.message.user_image
+      if (!userImage) return null
+
+      const origin = new URL(BASE_URL).origin
+      const imgRes = await axios.get(`${origin}${userImage}`, {
+        headers: { Cookie: cookieHeader },
+        httpsAgent: agent,
+        responseType: 'arraybuffer'
+      })
+
+      const base64 = Buffer.from(imgRes.data).toString('base64')
+      const contentType = imgRes.headers['content-type']?.split(';')[0].trim() || 'image/jpeg'
+      return `data:${contentType};base64,${base64}`
+    } catch (err) {
+      console.error('[get-avatar]', err.message)
+      return null
+    }
+  })
+
   ipcMain.handle('logout', async () => {
     cookieHeader = null
     clearSession()

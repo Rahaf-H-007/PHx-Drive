@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { ClockIcon } from '@heroicons/react/24/outline'
-import { formatRelativeTime } from '../utils/formatTime'
+import { formatRelativeTime } from '../utils/format'
 import { STATUS_CONFIG } from '../icons/fileStatusIcons'
 
 export default function StatusCard({ status }) {

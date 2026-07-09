@@ -5,18 +5,30 @@ import SettingsSyncMode from './SettingsSyncMode'
 import SettingsSignOut from './SettingsSignOut'
 import PageHeader from './PageHeader'
 import SettingsLinks from './SettingsLinks'
+import SettingsAccountDetail from './SettingsAccountDetail'
 
 export default function Settings() {
   const [settings, setSettings] = useState({
     syncFolder: '',
     syncMode: 'manual'
   })
+  const [view, setView] = useState('settings')
+  const [profile, setProfile] = useState(null)
+  const [quota, setQuota] = useState(null)
+  const [avatarSrc, setAvatarSrc] = useState(null)
 
   useEffect(() => {
     async function load() {
-      const settings = await window.api.loadSettings()
-
-      setSettings(settings)
+      const [settingsData, session, quotaData, avatar] = await Promise.all([
+        window.api.loadSettings(),
+        window.api.getSession(),
+        window.api.getStorageQuota(),
+        window.api.getAvatar()
+      ])
+      setSettings(settingsData)
+      setProfile(session)
+      setQuota(quotaData)
+      setAvatarSrc(avatar)
     }
 
     load()
@@ -29,6 +41,17 @@ export default function Settings() {
     console.log('settings saved successfully')
   }
 
+  if (view === 'account') {
+    return (
+      <SettingsAccountDetail
+        onBack={() => setView('settings')}
+        profile={profile}
+        quota={quota}
+        avatarSrc={avatarSrc}
+      />
+    )
+  }
+
   return (
     <main className="flex-1  overflow-y-auto">
       <PageHeader>
@@ -37,7 +60,12 @@ export default function Settings() {
       </PageHeader>
 
       <div className="flex flex-col gap-5 px-8 py-6">
-        <SettingsAccount />
+        <SettingsAccount
+          onClick={() => setView('account')}
+          profile={profile}
+          // avatarSrc={avatarSrc}
+          quota={quota}
+        />
 
         <SettingsFolder
           folderPath={settings.syncFolder}

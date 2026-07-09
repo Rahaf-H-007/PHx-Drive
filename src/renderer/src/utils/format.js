@@ -16,3 +16,10 @@ export function formatFileSize(bytes) {
   if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / 1024 ** 2).toFixed(1)} MB`
 }
+
+export function getInitials(name) {
+  if (!name) return '?'
+  const parts = name.trim().split(' ').filter(Boolean)
+  if (parts.length === 1) return parts[0][0].toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}

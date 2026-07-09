@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import ActivityIconBadge from './ActivityIconBadge'
-import { formatRelativeTime, formatFileSize } from '../utils/formatTime'
+import { formatRelativeTime, formatFileSize } from '../utils/format'
 
 export default function ActivityItem({ item, isLast }) {
   const filename = item.path.split('/').pop() || item.path

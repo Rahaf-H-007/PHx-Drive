@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useAuth } from '../contexts/AuthContext'
+import { getInitials } from '../utils/format'
 
 export default function UserProfile({ collapsed }) {
   const { user } = useAuth()
@@ -10,12 +11,11 @@ export default function UserProfile({ collapsed }) {
       }`}
     >
       <div className="w-9 h-9 bg-red-800 rounded-full flex items-center justify-center shrink-0">
-        <span className="text-white text-xs font-bold">{user.owner[0]}</span>
+        <span className="text-white text-xs font-bold">{getInitials(user.owner)}</span>
       </div>
       {!collapsed && (
         <div className="min-w-0">
           <p className="text-sm font-semibold text-gray-800 leading-snug">{user.owner}</p>
-          <p className="text-[11px] text-gray-400 leading-snug">Pro 50 GB</p>
         </div>
       )}
     </div>
