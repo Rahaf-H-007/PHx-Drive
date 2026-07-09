@@ -8,11 +8,11 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`${collapsed ? 'w-20' : 'w-65'} shrink-0 bg-white border-r border-gray-100 flex flex-col transition-all duration-300 ease-in-out relative`}
+      className={`${collapsed ? 'w-20' : 'w-65'} shrink-0 bg-base-100 border-r border-base-200 flex flex-col transition-all duration-300 ease-in-out relative`}
     >
       {/* Logo */}
       <div
-        className={`flex items-center gap-3 h-18 border-b border-gray-100 shrink-0 ${
+        className={`flex items-center gap-3 h-18 border-b border-base-200 shrink-0 ${
           collapsed ? 'justify-center px-2' : 'px-5'
         }`}
       >
@@ -21,7 +21,7 @@ export default function Sidebar() {
         </div>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-sm font-bold text-gray-900 leading-snug">PHx Drive</p>
+            <p className="text-sm font-bold text-base-content leading-snug">PHx Drive</p>
           </div>
         )}
       </div>
@@ -32,12 +32,12 @@ export default function Sidebar() {
       {/* Toggle button */}
       <button
         onClick={() => setCollapsed((c) => !c)}
-        className="absolute -right-3 top-20 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors z-10"
+        className="absolute -right-3 top-20 w-6 h-6 bg-base-100 border border-base-200 rounded-full flex items-center justify-center shadow-sm hover:bg-base-200 hover:cursor-pointer transition-colors z-10"
       >
         {collapsed ? (
-          <ChevronRightIcon size={14} className="text-gray-500" />
+          <ChevronRightIcon size={14} className="text-base-content/50" />
         ) : (
-          <ChevronLeftIcon size={14} className="text-gray-500" />
+          <ChevronLeftIcon size={14} className="text-base-content/50" />
         )}
       </button>
     </aside>

@@ -19,7 +19,7 @@ export default function Navbar({ collapsed }) {
   return (
     <nav className="flex-1 px-3 pt-5 pb-3 overflow-y-auto">
       {!collapsed && (
-        <p className="px-3 pb-2.5 text-[10px] font-semibold text-gray-400 uppercase tracking-[0.12em]">
+        <p className="px-3 pb-2.5 text-[10px] font-semibold text-base-content/40 uppercase tracking-[0.12em]">
           Menu
         </p>
       )}

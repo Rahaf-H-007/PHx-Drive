@@ -13,11 +13,13 @@ export default function NavItem({ item, active, collapsed }) {
         transition-colors duration-100 hover:cursor-pointer
         ${collapsed ? 'justify-center px-2' : 'px-3.5'}
         ${
-          active ? 'bg-red-50 text-red-800' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+          active
+            ? 'bg-red-800/10 text-red-800'
+            : 'text-base-content/50 hover:bg-base-200 hover:text-base-content/70'
         }`}
     >
       {/* icon */}
-      <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-red-700' : 'text-gray-500'}`} />
+      <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-red-700' : 'text-base-content/50'}`} />
 
       {/* text */}
       {!collapsed && (
@@ -26,7 +28,7 @@ export default function NavItem({ item, active, collapsed }) {
         </span>
       )}
 
-      {/* active state */}
+      {/* active indicator */}
       {!collapsed && active && <span className="text-red-400 shrink-0"></span>}
     </button>
   )

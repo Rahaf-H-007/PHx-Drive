@@ -6,7 +6,7 @@ export default function UserProfile({ collapsed }) {
   const { user } = useAuth()
   return (
     <div
-      className={`flex items-center gap-3 py-4 border-t border-gray-100 shrink-0 ${
+      className={`flex items-center gap-3 py-4 border-t border-base-200 shrink-0 ${
         collapsed ? 'justify-center px-2' : 'px-5'
       }`}
     >
@@ -15,7 +15,7 @@ export default function UserProfile({ collapsed }) {
       </div>
       {!collapsed && (
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-gray-800 leading-snug">{user.owner}</p>
+          <p className="text-sm font-semibold text-base-content leading-snug">{user.owner}</p>
         </div>
       )}
     </div>

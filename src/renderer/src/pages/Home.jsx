@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom'
 export default function Home() {
   return (
     <div
-      className="flex h-screen bg-[#f9f6f1] overflow-hidden select-none"
+      className="flex h-screen bg-base-200 overflow-hidden select-none"
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
     >
       <Sidebar />

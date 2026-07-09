@@ -6,6 +6,7 @@ import SettingsSignOut from './SettingsSignOut'
 import PageHeader from './PageHeader'
 import SettingsLinks from './SettingsLinks'
 import SettingsAccountDetail from './SettingsAccountDetail'
+import SettingsTheme from './SettingsTheme'
 
 export default function Settings() {
   const [settings, setSettings] = useState({
@@ -60,6 +61,7 @@ export default function Settings() {
       </PageHeader>
 
       <div className="flex flex-col gap-5 px-8 py-6">
+        <SettingsTheme />
         <SettingsAccount
           onClick={() => setView('account')}
           profile={profile}
