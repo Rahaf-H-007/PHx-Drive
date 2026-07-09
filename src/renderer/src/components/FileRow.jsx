@@ -10,8 +10,7 @@ export default function FileRow({ file, isLast }) {
   }
   return (
     <tr
-      className={`hover:bg-gray-50/60 transition-colors cursor-default
-  ${!isLast ? 'border-b border-gray-100' : ''}`}
+      className={`hover:bg-base-200/60 transition-colors cursor-default ${!isLast ? 'border-b border-base-200' : ''}`}
     >
       <td className="px-6 py-3.5 pr-4">
         <div className="flex items-start gap-3 min-w-0">
@@ -19,20 +18,16 @@ export default function FileRow({ file, isLast }) {
           <div className="mt-0.5 shrink-0">
             {TypeIcon && <TypeIcon className={`w-5 h-5 ${typeIconClass}`} />}
           </div>
-
           {/* name */}
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">{file.title}</p>
+            <p className="text-sm font-medium text-base-content truncate">{file.title}</p>
           </div>
         </div>
       </td>
-
       {/* Size */}
       <FileRowSize size={file.file_size} />
-
       {/* Modified */}
       <FileRowModifiedDate added={file.creation} />
-
       {/* Status */}
       <FileRowStatus status={file.state} onDownload={handleDownload} />
     </tr>

@@ -2,7 +2,7 @@
 export default function FileRowModifiedDate({ added }) {
   return (
     <td className="w-44 pt-0.5">
-      <span className="text-sm text-gray-500">
+      <span className="text-sm text-base-content/50">
         {new Date(added).toLocaleString([], {
           year: 'numeric',
           month: 'numeric',

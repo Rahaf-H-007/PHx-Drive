@@ -58,48 +58,30 @@ export default function FileTable({ search, syncTick }) {
 
   return (
     <div className="flex-1 px-8 py-5 overflow-auto m-0 mt-2">
-      <div className="border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+      <div className="border border-base-200 rounded-xl shadow-sm overflow-hidden">
         {/* loading */}
         {isLoading && <LoadingSpinner />}
-
         {/* empty files */}
         {!isLoading && filteredFiles.length === 0 && <EmptyFiles />}
-
         {!isLoading && filteredFiles.length > 0 && (
-          <table className="w-full table-fixed bg-white">
+          <table className="w-full table-fixed bg-base-100">
             {/* Column headers */}
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/50">
-                <th
-                  className="px-6 py-3 text-left text-[11px] font-semibold text-gray-400
-              uppercase tracking-[0.08em]"
-                >
+              <tr className="border-b border-base-200 bg-base-200/50">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-base-content/40 uppercase tracking-[0.08em]">
                   Name
                 </th>
-
-                <th
-                  className="w-24 px-0 py-3 text-left text-[11px] font-semibold text-gray-400
-              uppercase tracking-[0.08em]"
-                >
+                <th className="w-24 px-0 py-3 text-left text-[11px] font-semibold text-base-content/40 uppercase tracking-[0.08em]">
                   Size
                 </th>
-
-                <th
-                  className="w-44 px-0 py-3 text-left text-[11px] font-semibold text-gray-400
-              uppercase tracking-[0.08em]"
-                >
+                <th className="w-44 px-0 py-3 text-left text-[11px] font-semibold text-base-content/40 uppercase tracking-[0.08em]">
                   Added
                 </th>
-
-                <th
-                  className="w-32 px-0 py-3 text-left text-[11px] font-semibold text-gray-400
-              uppercase tracking-[0.08em]"
-                >
+                <th className="w-32 px-0 py-3 text-left text-[11px] font-semibold text-base-content/40 uppercase tracking-[0.08em]">
                   Status
                 </th>
               </tr>
             </thead>
-
             {/* Rows */}
             <tbody>
               {filteredFiles.map((file, idx) => (

@@ -22,13 +22,11 @@ export default function MenuFiles() {
   return (
     <main className="flex-1 flex flex-col overflow-hidden">
       <PageHeader isSyncing={isSyncing}>
-        <h1 className="text-lg font-bold text-gray-900 leading-tight">Files</h1>
-        <p className="text-xs text-gray-400 leading-tight">Your synced files</p>
+        <h1 className="text-lg font-bold text-base-content leading-tight">Files</h1>
+        <p className="text-xs text-base-content/40 leading-tight">Your synced files</p>
       </PageHeader>
-
       <div className="flex-1 overflow-auto">
         <Toolbar search={search} setSearch={setSearch} onSyncNow={handleSyncNow} />
-
         <FileTable search={search} syncTick={syncTick} />
       </div>
       <Footer />
