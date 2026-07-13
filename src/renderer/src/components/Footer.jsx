@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ServerIcon } from '@heroicons/react/24/outline'
+import { formatGB } from '../utils/format'
 
 export default function Footer() {
   const [quota, setQuota] = useState(null)
@@ -56,8 +57,4 @@ export default function Footer() {
       </span>
     </footer>
   )
-}
-
-function formatGB(bytes) {
-  return (bytes / 1024 ** 3).toFixed(2)
 }

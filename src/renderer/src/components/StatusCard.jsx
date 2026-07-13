@@ -25,7 +25,6 @@ export default function StatusCard({ status }) {
   )
 }
 
-//TODO: might need to use this in the main tab so will keep it here for now
 function getStatusLabel(status) {
   if (!status) return null
   const time = formatRelativeTime(status.lastSyncedAt)

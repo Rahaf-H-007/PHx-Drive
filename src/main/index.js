@@ -55,7 +55,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  //Electron extra config. TODO: uncomment when done
+  //Electron extra config.
   // Set app user model id for windows
   app.setAppUserModelId('com.electron')
   // Default open or close DevTools by F12 in development

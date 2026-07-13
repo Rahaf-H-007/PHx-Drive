@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 import PageHeader from './PageHeader'
 import SettingsCard from './SettingsCard'
-import { formatFileSize, getInitials } from '../utils/format'
+import { formatGB, getInitials } from '../utils/format'
 import SettingsAccountDetailRow from './SettingsAccountDetailsRow'
 
 function extractRank(rankArray) {
@@ -86,11 +86,11 @@ export default function SettingsAccountDetail({ onBack, profileData, quota }) {
           <div className="px-5 pt-3 pb-5 flex flex-col gap-3">
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-base-content">
-                <span className="font-medium">{formatFileSize(quota?.used)}</span>
-                <span className="text-base-content/40"> used</span>
+                <span className="font-medium">{formatGB(quota?.used)}</span>
+                <span className="text-base-content/40"> GB used</span>
               </span>
               <span className="text-sm text-base-content/40">
-                {formatFileSize(quota?.limit)} total
+                {formatGB(quota?.limit)} GB total
               </span>
             </div>
             <div className="w-full h-2 bg-base-200 rounded-full overflow-hidden">
@@ -100,7 +100,7 @@ export default function SettingsAccountDetail({ onBack, profileData, quota }) {
               />
             </div>
             <p className="text-xs text-base-content/40">
-              {formatFileSize(quota?.available)} available
+              {formatGB(quota?.available)} GB available
             </p>
           </div>
         </SettingsCard>

@@ -1,4 +1,3 @@
-//TODO: use this in main tab as well
 export function formatRelativeTime(ts) {
   if (!ts) return null
   const s = Math.floor((Date.now() - ts) / 1000)
@@ -11,10 +10,15 @@ export function formatRelativeTime(ts) {
 }
 
 export function formatFileSize(bytes) {
-  if (!bytes) return null
+  if (bytes == null) return null
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / 1024 ** 2).toFixed(1)} MB`
+}
+
+export function formatGB(bytes) {
+  if (bytes == null) return null
+  return (bytes / 1024 ** 3).toFixed(2)
 }
 
 export function getInitials(name) {
