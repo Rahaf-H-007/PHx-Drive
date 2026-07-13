@@ -6,9 +6,8 @@ import { syncFolder, waitForSyncToFinish } from './sync'
 import { startAutoSync, stopAutoSync } from './sync-file-watcher'
 import { shell } from 'electron'
 import { getCurrentUserEmail } from './auth'
+import { pathToFileURL } from 'url'
 
-// const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
-const HOWTO_GUIDE_URL = import.meta.env.MAIN_VITE_HOWTO_GUIDE_URL
 const DRIVE_WEB = import.meta.env.MAIN_VITE_DRIVE_HOME
 
 export function registerSettingsHandlers(ipcMain) {
@@ -89,7 +88,11 @@ export function registerSettingsHandlers(ipcMain) {
   }
 
   ipcMain.handle('links:open-guide', () => {
-    shell.openExternal(HOWTO_GUIDE_URL)
+    const pdfPath = app.isPackaged
+      ? join(process.resourcesPath, 'guide.pdf')
+      : join(app.getAppPath(), 'resources', 'guide.pdf')
+
+    shell.openExternal(pathToFileURL(pdfPath).toString())
   })
 
   ipcMain.handle('links:open-web-app', () => {
