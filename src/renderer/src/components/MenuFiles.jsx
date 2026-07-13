@@ -9,6 +9,8 @@ export default function MenuFiles() {
   const [syncTick, setSyncTick] = useState(0)
   const [isSyncing, setIsSyncing] = useState(false)
 
+  // this is to track if we started/stopped syncing
+  //for the "online. syncing" icon and for the tray
   useEffect(() => {
     const cleanup = window.api.onSyncStatus(({ syncing }) => setIsSyncing(syncing))
     return cleanup

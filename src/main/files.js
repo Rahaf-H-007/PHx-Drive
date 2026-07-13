@@ -1,9 +1,11 @@
 import axios from 'axios'
 import https from 'https'
 import { getCookieHeader } from './auth'
+import { getAllFiles } from './db/metadata'
 
 const BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
 
+//get home id to display its files
 export async function getHomeId() {
   //get user details from cookie
   const cookie = getCookieHeader()
@@ -39,13 +41,24 @@ export function registerFileHandlers(ipcMain) {
           file_kind_list: '[]',
           tag_list: '[]'
         },
-        headers: {
-          Cookie: getCookieHeader()
-        },
+        headers: { Cookie: getCookieHeader() },
         httpsAgent: new https.Agent({ rejectUnauthorized: false })
       })
-      // console.log(response.data.message)
-      return { success: true, message: response.data.message }
+
+      const tracked = getAllFiles()
+      // remove files that dont have a remote id and make each file an object
+      // with the remote id as the key and the state as the value
+      const stateByRemoteId = Object.fromEntries(
+        tracked.filter((f) => f.remote_id).map((f) => [f.remote_id, f.state])
+      )
+
+      //take all properties from server and add state
+      const files = response.data.message.map((f) => ({
+        ...f,
+        state: stateByRemoteId[f.name] ?? null
+      }))
+
+      return { success: true, message: files }
     } catch (err) {
       return { success: false, error: err.message }
     }

@@ -5,17 +5,25 @@ import { createContext, useContext, useEffect, useState } from 'react'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user, setUserState] = useState(null)
 
   useEffect(() => {
-    window.api.getSession().then((savedUser) => {
-      if (savedUser) setUser(savedUser)
+    window.api.getSession().then(async (savedUser) => {
+      if (savedUser) setUserState(savedUser)
+      await window.api.setWindowMode(savedUser ? 'main' : 'login')
     })
   }, [])
 
+  // wraps the setter so that no changes are needed needed in LoginForm
+  function setUser(userData) {
+    setUserState(userData)
+    if (userData) window.api.setWindowMode('main')
+  }
+
   async function logout() {
     await window.api.logout()
-    setUser(null)
+    setUserState(null)
+    window.api.setWindowMode('login')
   }
 
   return <AuthContext.Provider value={{ user, setUser, logout }}>{children}</AuthContext.Provider>

@@ -5,8 +5,9 @@ import { clearMetadata } from './db/metadata'
 import { syncFolder, waitForSyncToFinish } from './sync'
 import { startAutoSync, stopAutoSync } from './sync-file-watcher'
 import { shell } from 'electron'
+import { getCurrentUserEmail } from './auth'
 
-const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
+// const SETTINGS_PATH = join(app.getPath('userData'), 'settings.dat')
 const HOWTO_GUIDE_URL = import.meta.env.MAIN_VITE_HOWTO_GUIDE_URL
 const DRIVE_WEB = import.meta.env.MAIN_VITE_DRIVE_HOME
 
@@ -26,7 +27,9 @@ export function registerSettingsHandlers(ipcMain) {
 
   ipcMain.handle('settings:save', async (_, settings) => {
     try {
-      const previousSettings = loadSettings()
+      const email = getCurrentUserEmail()
+      if (!email) return { success: false, error: 'Not logged in' }
+      const previousSettings = loadSettings(email)
       const syncFolderChanged = previousSettings?.syncFolder !== settings.syncFolder
 
       // no new polls
@@ -38,7 +41,7 @@ export function registerSettingsHandlers(ipcMain) {
         clearMetadata()
       }
 
-      saveSettings(settings)
+      saveSettings(email, settings)
 
       console.log({
         previous: previousSettings?.syncFolder,
@@ -67,7 +70,9 @@ export function registerSettingsHandlers(ipcMain) {
 
   ipcMain.handle('settings:load', async () => {
     try {
-      return loadSettings()
+      const email = getCurrentUserEmail()
+      if (!email) return { syncFolder: '', syncMode: 'manual' }
+      return loadSettings(email) ?? { syncFolder: '', syncMode: 'manual' }
     } catch (err) {
       console.log(err)
       return {
@@ -77,7 +82,10 @@ export function registerSettingsHandlers(ipcMain) {
     }
   })
 
-  const settings = loadSettings()
+  // Startup auto-sync — getCurrentUserEmail() is already populated
+  // by initSession() before registerSettingsHandlers is ever called
+  const email = getCurrentUserEmail()
+  const settings = email ? loadSettings(email) : null
   if (settings?.syncMode === 'automatic' && settings?.syncFolder) {
     startAutoSync(settings.syncFolder)
   }
@@ -91,20 +99,26 @@ export function registerSettingsHandlers(ipcMain) {
   })
 }
 
-export function saveSettings(settings) {
-  const json = JSON.stringify(settings)
-
-  const encrypted = safeStorage.encryptString(json)
-
-  writeFileSync(SETTINGS_PATH, encrypted)
-  // console.log(SETTINGS_PATH)
+function getSettingsPath(email) {
+  // Sanitise the email so it's safe as a filename
+  const safe = email.replace(/[^a-zA-Z0-9._-]/g, '_')
+  return join(app.getPath('userData'), `settings-${safe}.enc`)
 }
 
-export function loadSettings() {
+export function saveSettings(email, settings) {
+  if (!email) throw new Error('Cannot save settings: no user email')
+  const json = JSON.stringify(settings)
+  const encrypted = safeStorage.encryptString(json)
+  writeFileSync(getSettingsPath(email), encrypted)
+}
+
+export function loadSettings(email) {
+  if (!email) return null
   if (!safeStorage.isEncryptionAvailable()) return null
-  if (!existsSync(SETTINGS_PATH)) return null
+  const path = getSettingsPath(email)
+  if (!existsSync(path)) return null
   try {
-    const encrypted = readFileSync(SETTINGS_PATH)
+    const encrypted = readFileSync(path)
     const json = safeStorage.decryptString(encrypted)
     return JSON.parse(json)
   } catch (err) {
@@ -112,3 +126,25 @@ export function loadSettings() {
     return null
   }
 }
+
+// export function saveSettings(settings) {
+//   const json = JSON.stringify(settings)
+
+//   const encrypted = safeStorage.encryptString(json)
+
+//   writeFileSync(SETTINGS_PATH, encrypted)
+//   // console.log(SETTINGS_PATH)
+// }
+
+// export function loadSettings() {
+//   if (!safeStorage.isEncryptionAvailable()) return null
+//   if (!existsSync(SETTINGS_PATH)) return null
+//   try {
+//     const encrypted = readFileSync(SETTINGS_PATH)
+//     const json = safeStorage.decryptString(encrypted)
+//     return JSON.parse(json)
+//   } catch (err) {
+//     console.log(err)
+//     return null
+//   }
+// }

@@ -39,7 +39,7 @@ export default function LoginForm() {
   }
   return (
     <div className="mt-5 p-8 sm:mx-auto sm:w-full sm:max-w-sm border border-base-200 rounded-md shadow-[0_8px_48px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_48px_rgba(255,255,255,0.06)]">
-      <Logo />
+      <Logo className="w-24 mx-auto mb-0" />
       <LoginHeader />
 
       <form onSubmit={handleSubmit} className="space-y-6">

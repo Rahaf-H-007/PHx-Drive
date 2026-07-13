@@ -2,6 +2,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import Navbar from './NavBar'
 import UserProfile from './UserProfile'
 import { useState } from 'react'
+import Logo from './Logo'
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
@@ -16,9 +17,7 @@ export default function Sidebar() {
           collapsed ? 'justify-center px-2' : 'px-5'
         }`}
       >
-        <div className="w-9 h-9 bg-red-800 rounded-lg flex items-center justify-center shrink-0 shadow-sm">
-          <span className="text-white text-sm font-black tracking-tight">Px</span>
-        </div>
+        <Logo className="w-12 shrink-0" />
         {!collapsed && (
           <div className="min-w-0">
             <p className="text-sm font-bold text-base-content leading-snug">PHx Drive</p>

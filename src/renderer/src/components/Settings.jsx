@@ -9,46 +9,36 @@ import SettingsAccountDetail from './SettingsAccountDetail'
 import SettingsTheme from './SettingsTheme'
 
 export default function Settings() {
-  const [settings, setSettings] = useState({
-    syncFolder: '',
-    syncMode: 'manual'
-  })
+  const [settings, setSettings] = useState({ syncFolder: '', syncMode: 'manual' })
   const [view, setView] = useState('settings')
-  const [profile, setProfile] = useState(null)
+  const [profileData, setProfileData] = useState(null)
   const [quota, setQuota] = useState(null)
-  const [avatarSrc, setAvatarSrc] = useState(null)
 
   useEffect(() => {
     async function load() {
-      const [settingsData, session, quotaData, avatar] = await Promise.all([
+      const [settingsData, quotaData, profile] = await Promise.all([
         window.api.loadSettings(),
-        window.api.getSession(),
         window.api.getStorageQuota(),
-        window.api.getAvatar()
+        window.api.getProfile()
       ])
       setSettings(settingsData)
-      setProfile(session)
       setQuota(quotaData)
-      setAvatarSrc(avatar)
+      setProfileData(profile)
     }
-
     load()
   }, [])
 
   const handleSave = async () => {
     const results = await window.api.saveSettings(settings)
-    console.log(results)
-    console.log(settings)
-    console.log('settings saved successfully')
+    console.log(results, settings, 'settings saved successfully')
   }
 
   if (view === 'account') {
     return (
       <SettingsAccountDetail
         onBack={() => setView('settings')}
-        profile={profile}
+        profileData={profileData}
         quota={quota}
-        avatarSrc={avatarSrc}
       />
     )
   }
@@ -63,12 +53,7 @@ export default function Settings() {
       </PageHeader>
       <div className="flex flex-col gap-5 px-8 py-6">
         <SettingsTheme />
-        <SettingsAccount
-          onClick={() => setView('account')}
-          profile={profile}
-          // avatarSrc={avatarSrc}
-          quota={quota}
-        />
+        <SettingsAccount onClick={() => setView('account')} />
         <SettingsFolder
           folderPath={settings.syncFolder}
           onFolderChange={(folder) =>

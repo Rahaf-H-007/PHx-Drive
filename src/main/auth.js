@@ -5,14 +5,17 @@ import axios from 'axios'
 import https from 'https'
 
 const BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
-
 const SESSION_PATH = join(app.getPath('userData'), 'session.enc')
+const EMAIL_PATH = join(app.getPath('userData'), 'user.enc')
 
 // cookieHeader is private in this file
-// nothing outside can touch it directly
+// handlers that need the cookie use getCookieHeader
+//were using email to save user settings(in case user logs in woth different credentials)
 let cookieHeader = null
 let owner = null
+let currentUserEmail = null
 
+//save session and encrypt it
 function saveSession(cookie) {
   const encrypted = safeStorage.encryptString(cookie)
   writeFileSync(SESSION_PATH, encrypted)
@@ -34,13 +37,38 @@ function clearSession() {
   if (existsSync(SESSION_PATH)) rmSync(SESSION_PATH)
 }
 
+//save email and encrypt it
+function saveEmail(email) {
+  const encrypted = safeStorage.encryptString(email)
+  writeFileSync(EMAIL_PATH, encrypted)
+}
+
+function loadEmail() {
+  if (!safeStorage.isEncryptionAvailable()) return null
+  if (!existsSync(EMAIL_PATH)) return null
+  try {
+    const encrypted = readFileSync(EMAIL_PATH)
+    return safeStorage.decryptString(encrypted)
+  } catch {
+    return null
+  }
+}
+
+function clearEmail() {
+  if (existsSync(EMAIL_PATH)) rmSync(EMAIL_PATH)
+}
+
+export function getCurrentUserEmail() {
+  return currentUserEmail
+}
+
 // restore any saved session on startup
 export function initSession() {
   cookieHeader = loadSession()
+  currentUserEmail = loadEmail()
 }
 
 // get cookieHeader for other funtions (file handlers)
-// without letting renderer access it
 export function getCookieHeader() {
   return cookieHeader
 }
@@ -66,6 +94,7 @@ export function registerAuthHandlers(ipcMain) {
         httpsAgent: new https.Agent({ rejectUnauthorized: false })
       })
 
+      //this gets full_name and replaces the synbols with a space
       owner = decodeURIComponent(
         cookies
           .find((c) => c.startsWith('full_name='))
@@ -73,6 +102,9 @@ export function registerAuthHandlers(ipcMain) {
           .split('=')[1]
           .replace(/\+/g, ' ') ?? ''
       )
+
+      currentUserEmail = loggedUser.data.message
+      saveEmail(currentUserEmail)
 
       return { success: true, user: loggedUser.data.message, owner }
     } catch (error) {
@@ -96,7 +128,8 @@ export function registerAuthHandlers(ipcMain) {
           ?.split('=')[1]
           .replace(/\+/g, ' ') ?? ''
       )
-      console.log(owner)
+      currentUserEmail = response.data.message
+
       return { user: response.data.message, owner }
     } catch {
       cookieHeader = null
@@ -105,7 +138,7 @@ export function registerAuthHandlers(ipcMain) {
     }
   })
 
-  ipcMain.handle('profile:get-avatar', async () => {
+  ipcMain.handle('profile:get-profile', async () => {
     if (!cookieHeader) return null
     const agent = new https.Agent({ rejectUnauthorized: false })
     try {
@@ -117,39 +150,71 @@ export function registerAuthHandlers(ipcMain) {
       )
       if (!userId) return null
 
-      const response = await axios.post(
-        `${BASE_URL}/method/frappe.client.get`,
-        { doctype: 'User', name: userId },
-        {
-          headers: { Cookie: cookieHeader },
-          httpsAgent: agent
+      // Fetch user data, energy points, and rank all at once
+      const [userRes, energyRes, rankRes] = await Promise.all([
+        axios.post(
+          `${BASE_URL}/method/frappe.client.get`,
+          { doctype: 'User', name: userId },
+          { headers: { Cookie: cookieHeader }, httpsAgent: agent }
+        ),
+        axios.post(
+          `${BASE_URL}/method/frappe.social.doctype.energy_point_log.energy_point_log.get_user_energy_and_review_points`,
+          { user: userId },
+          { headers: { Cookie: cookieHeader }, httpsAgent: agent }
+        ),
+        axios.post(
+          `${BASE_URL}/method/frappe.desk.page.user_profile.user_profile.get_user_rank`,
+          { user: userId },
+          { headers: { Cookie: cookieHeader }, httpsAgent: agent }
+        )
+      ])
+
+      const userData = userRes.data?.message ?? {}
+      const energyData = energyRes.data?.message ?? {}
+      const rankData = rankRes.data?.message ?? {}
+
+      // avatar in its own try catch because if it failed
+      // it shouldn't block everythign else
+      let avatarDataUrl = null
+      if (userData.user_image) {
+        try {
+          const origin = new URL(BASE_URL).origin
+          const imgRes = await axios.get(`${origin}${userData.user_image}`, {
+            headers: { Cookie: cookieHeader },
+            httpsAgent: agent,
+            responseType: 'arraybuffer'
+          })
+          const base64 = Buffer.from(imgRes.data).toString('base64')
+          const contentType = imgRes.headers['content-type']?.split(';')[0].trim() || 'image/jpeg'
+          avatarDataUrl = `data:${contentType};base64,${base64}`
+        } catch (imgErr) {
+          console.error('[get-profile] avatar fetch failed:', imgErr.message)
         }
-      )
+      }
 
-      const userImage = response.data.message.user_image
-      if (!userImage) return null
-
-      const origin = new URL(BASE_URL).origin
-      const imgRes = await axios.get(`${origin}${userImage}`, {
-        headers: { Cookie: cookieHeader },
-        httpsAgent: agent,
-        responseType: 'arraybuffer'
-      })
-
-      const base64 = Buffer.from(imgRes.data).toString('base64')
-      const contentType = imgRes.headers['content-type']?.split(';')[0].trim() || 'image/jpeg'
-      return `data:${contentType};base64,${base64}`
+      return {
+        avatarDataUrl,
+        fullName: userData.full_name ?? null,
+        email: userData.email ?? userId,
+        language: userData.language ?? null,
+        timezone: userData.time_zone ?? null,
+        country: userData.country ?? null,
+        energyPoints: energyData.energy_points ?? 0,
+        reviewPoints: energyData.review_points ?? 0,
+        monthlyRank: rankData.monthly_rank ?? [],
+        allTimeRank: rankData.all_time_rank ?? []
+      }
     } catch (err) {
-      console.error('[get-avatar]', err.message)
+      console.error('[get-profile]', err.message)
       return null
     }
   })
 
   ipcMain.handle('logout', async () => {
     cookieHeader = null
+    currentUserEmail = null
+    clearEmail()
     clearSession()
     return { success: true }
   })
 }
-
-// handlers that need the cookie use getCookieHeader

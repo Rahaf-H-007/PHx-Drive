@@ -26,6 +26,7 @@ import {
   notifyQuotaExceeded
 } from './stoargeQuota'
 import { logActivity } from './db/activityLog'
+import { getCurrentUserEmail } from './auth'
 
 let syncPromise = null
 let _statusNotifier = () => {}
@@ -35,23 +36,27 @@ export function setSyncStatusNotifier(fn) {
   _statusNotifier = fn
 }
 
+//when regitsering sync handler
 export async function registerSyncHandlers(ipcMain, mainWindow, { onSyncStatus } = {}) {
   registerStorageHandlers(ipcMain)
 
-  // set once at startup
+  // set once at startup file states(synced/not synced)
   setNotifier((payload) => {
     if (!mainWindow.isDestroyed()) {
       mainWindow.webContents.send('sync:file-state', payload)
     }
   })
 
+  // send syncStatusnotifier to the renderer
   setSyncStatusNotifier((payload) => {
     if (!mainWindow.isDestroyed()) mainWindow.webContents.send('sync:status', payload)
     onSyncStatus?.(payload)
   })
 
   ipcMain.handle('sync:manual', async () => {
-    const settings = await loadSettings()
+    const email = getCurrentUserEmail()
+    const settings = loadSettings(email)
+    if (!settings?.syncFolder) return { success: false, error: 'No sync folder configured' }
     try {
       await syncFolder(settings.syncFolder)
       return { success: true }
@@ -61,7 +66,9 @@ export async function registerSyncHandlers(ipcMain, mainWindow, { onSyncStatus }
   })
 
   ipcMain.handle('sync:download-file', async (_, remoteId) => {
-    const settings = await loadSettings()
+    const email = getCurrentUserEmail()
+    const settings = loadSettings(email)
+    if (!settings?.syncFolder) return { success: false, error: 'No sync folder configured' }
     const dbFile = getFileByRemoteId(remoteId)
     if (!dbFile || dbFile.state !== 'online_only') {
       return { success: false, error: 'Not an online-only file' }
@@ -93,11 +100,13 @@ export async function registerSyncHandlers(ipcMain, mainWindow, { onSyncStatus }
 }
 
 export function syncFolder(syncFolderPath, mode = 'normal') {
+  //if tehres already sync then do nothing
   if (syncPromise) {
     console.log('Sync already in progress, skipping')
     return syncPromise
   }
 
+  //otherwise sync is happening so no errors and syncing state is true so its sent to the renderer
   _syncHadError = false
   _statusNotifier({ syncing: true, error: false })
 
@@ -130,7 +139,7 @@ async function runSync(syncFolderPath, mode) {
     operations
   })
 
-  // fetch quota once per sync. If it fails, proceed without blocking uploads
+  // fetch quota once per sync. if it fails, proceed without blocking uploads
   //with the start of every sync we will ignore the cache and ask frappe directly for the quota
   // (this is for if someone uplaoded a file on the frappe drive web app)
   let quota = null

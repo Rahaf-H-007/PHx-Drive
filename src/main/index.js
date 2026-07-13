@@ -11,15 +11,20 @@ import { createTray, destroyTray, setTrayState } from './tray'
 
 let isQuitting = false
 
+const LOGIN_SIZE = { width: 440, height: 750 }
+const MAIN_SIZE = { width: 1200, height: 800 }
+const MAIN_MIN = { width: 950, height: 750 }
+
 let mainWindow
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 950,
-    minHeight: 750,
-    //     show: false,
+    width: LOGIN_SIZE.width,
+    height: LOGIN_SIZE.height,
+    // hidden until auth state is known
+    show: false,
+    // login window is fixed size
+    resizable: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js')
@@ -52,7 +57,7 @@ function createWindow() {
 app.whenReady().then(() => {
   //Electron extra config. TODO: uncomment when done
   // Set app user model id for windows
-  // electronApp.setAppUserModelId('com.electron')
+  app.setAppUserModelId('com.electron')
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production
   app.on('browser-window-created', (_, window) => {
@@ -60,7 +65,7 @@ app.whenReady().then(() => {
   })
 
   createWindow()
-  // get session
+
   initSession()
 
   registerAuthHandlers(ipcMain)
@@ -87,6 +92,26 @@ app.whenReady().then(() => {
         mainWindow.webContents.send('app:navigate', '/settings')
       }
     }
+  })
+
+  ipcMain.handle('window:set-mode', (_, mode) => {
+    if (!mainWindow || mainWindow.isDestroyed()) return
+
+    if (mode === 'main') {
+      mainWindow.setResizable(true)
+      mainWindow.setMinimumSize(MAIN_MIN.width, MAIN_MIN.height)
+      mainWindow.setSize(MAIN_SIZE.width, MAIN_SIZE.height)
+      mainWindow.center()
+      mainWindow.maximize()
+    } else {
+      mainWindow.unmaximize()
+      mainWindow.setResizable(false)
+      mainWindow.setMinimumSize(LOGIN_SIZE.width, LOGIN_SIZE.height)
+      mainWindow.setSize(LOGIN_SIZE.width, LOGIN_SIZE.height)
+      mainWindow.center()
+    }
+
+    if (!mainWindow.isVisible()) mainWindow.show()
   })
 })
 

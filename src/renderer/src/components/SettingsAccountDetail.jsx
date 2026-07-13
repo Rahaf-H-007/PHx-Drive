@@ -1,29 +1,21 @@
 /* eslint-disable react/prop-types */
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
-import { /* useEffect, */ useState } from 'react'
+import { useState } from 'react'
 import PageHeader from './PageHeader'
 import SettingsCard from './SettingsCard'
 import { formatFileSize, getInitials } from '../utils/format'
+import SettingsAccountDetailRow from './SettingsAccountDetailsRow'
 
-//TODO: clean up comments if UI is approved
-export default function SettingsAccountDetail({ onBack, profile, quota, avatarSrc }) {
+function extractRank(rankArray) {
+  if (!Array.isArray(rankArray) || rankArray.length === 0) return null
+  return rankArray[0]?.rank ?? null
+}
+
+export default function SettingsAccountDetail({ onBack, profileData, quota }) {
   const [imgError, setImgError] = useState(false)
   const usedPercent = quota ? Math.min(100, Math.round((quota.used / quota.limit) * 100)) : 0
-
-  // useEffect(() => {
-  //   async function load() {
-  //     const [session, quotaData, avatar] = await Promise.all([
-  //       window.api.getSession(),
-  //       window.api.getStorageQuota(),
-  //       window.api.getAvatar()
-  //     ])
-  //     setProfile(session)
-  //     setQuota(quotaData)
-  //     setAvatarSrc(avatar)
-  //     setLoading(false)
-  //   }
-  //   load()
-  // }, [])
+  const monthlyRank = extractRank(profileData?.monthlyRank)
+  const allTimeRank = extractRank(profileData?.allTimeRank)
 
   return (
     <main className="flex-1 overflow-y-auto">
@@ -48,28 +40,48 @@ export default function SettingsAccountDetail({ onBack, profile, quota, avatarSr
         <SettingsCard label="Profile">
           <div className="flex items-center gap-4 px-5 py-4">
             <div className="shrink-0 w-20 h-20 rounded-4xl overflow-hidden bg-[#8B1A1A] flex items-center justify-center text-white text-base font-semibold select-none">
-              {!imgError && avatarSrc ? (
+              {!imgError && profileData?.avatarDataUrl ? (
                 <img
-                  src={avatarSrc}
-                  alt={profile?.owner ?? ''}
+                  src={profileData.avatarDataUrl}
+                  alt={profileData?.fullName ?? ''}
                   className="w-full h-full object-cover"
                   onError={() => setImgError(true)}
                 />
               ) : (
-                getInitials(profile?.owner)
+                getInitials(profileData?.fullName)
               )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-base-content leading-tight truncate">
-                {profile?.owner || '—'}
+                {profileData?.fullName || '—'}
               </p>
               <p className="text-sm text-base-content/50 mt-0.5 leading-tight truncate">
-                {profile?.user || '—'}
+                {profileData?.email || '—'}
               </p>
             </div>
           </div>
         </SettingsCard>
 
+        {/* Details */}
+        <SettingsCard label="Details">
+          <div className="pt-1 pb-1">
+            <SettingsAccountDetailRow label="Language" value={profileData?.language} />
+            <SettingsAccountDetailRow label="Timezone" value={profileData?.timezone} />
+            <SettingsAccountDetailRow label="Country" value={profileData?.country} />
+          </div>
+        </SettingsCard>
+
+        {/* Activity */}
+        <SettingsCard label="Activity">
+          <div className="pt-1 pb-1">
+            <SettingsAccountDetailRow label="Energy Points" value={profileData?.energyPoints} />
+            <SettingsAccountDetailRow label="Review Points" value={profileData?.reviewPoints} />
+            <SettingsAccountDetailRow label="Monthly Rank" value={monthlyRank} />
+            <SettingsAccountDetailRow label="All-time Rank" value={allTimeRank} />
+          </div>
+        </SettingsCard>
+
+        {/* Storage */}
         <SettingsCard label="Storage">
           <div className="px-5 pt-3 pb-5 flex flex-col gap-3">
             <div className="flex items-baseline justify-between">

@@ -39,7 +39,8 @@ const api = {
     return () => ipcRenderer.removeListener('app:navigate', listener)
   },
   downloadFile: (remoteId) => ipcRenderer.invoke('sync:download-file', remoteId),
-  getAvatar: () => ipcRenderer.invoke('profile:get-avatar')
+  getProfile: () => ipcRenderer.invoke('profile:get-profile'),
+  setWindowMode: (mode) => ipcRenderer.invoke('window:set-mode', mode)
 }
 
 try {
