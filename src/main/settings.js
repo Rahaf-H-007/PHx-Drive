@@ -82,8 +82,6 @@ export function registerSettingsHandlers(ipcMain) {
     }
   })
 
-  // Startup auto-sync — getCurrentUserEmail() is already populated
-  // by initSession() before registerSettingsHandlers is ever called
   const email = getCurrentUserEmail()
   const settings = email ? loadSettings(email) : null
   if (settings?.syncMode === 'automatic' && settings?.syncFolder) {
@@ -126,25 +124,3 @@ export function loadSettings(email) {
     return null
   }
 }
-
-// export function saveSettings(settings) {
-//   const json = JSON.stringify(settings)
-
-//   const encrypted = safeStorage.encryptString(json)
-
-//   writeFileSync(SETTINGS_PATH, encrypted)
-//   // console.log(SETTINGS_PATH)
-// }
-
-// export function loadSettings() {
-//   if (!safeStorage.isEncryptionAvailable()) return null
-//   if (!existsSync(SETTINGS_PATH)) return null
-//   try {
-//     const encrypted = readFileSync(SETTINGS_PATH)
-//     const json = safeStorage.decryptString(encrypted)
-//     return JSON.parse(json)
-//   } catch (err) {
-//     console.log(err)
-//     return null
-//   }
-// }

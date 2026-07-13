@@ -40,7 +40,8 @@ const api = {
   },
   downloadFile: (remoteId) => ipcRenderer.invoke('sync:download-file', remoteId),
   getProfile: () => ipcRenderer.invoke('profile:get-profile'),
-  setWindowMode: (mode) => ipcRenderer.invoke('window:set-mode', mode)
+  setWindowMode: (mode) => ipcRenderer.invoke('window:set-mode', mode),
+  openFolder: (folderTitle) => ipcRenderer.invoke('folder:open', folderTitle)
 }
 
 try {

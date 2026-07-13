@@ -1,7 +1,10 @@
 import axios from 'axios'
 import https from 'https'
-import { getCookieHeader } from './auth'
+import { getCookieHeader, getCurrentUserEmail } from './auth'
 import { getAllFiles } from './db/metadata'
+import { loadSettings } from './settings'
+import { join } from 'path'
+import { shell } from 'electron'
 
 const BASE_URL = import.meta.env.MAIN_VITE_FRAPPE_URL
 
@@ -59,6 +62,24 @@ export function registerFileHandlers(ipcMain) {
       }))
 
       return { success: true, message: files }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
+  })
+
+  ipcMain.handle('folder:open', async (_, folderTitle) => {
+    try {
+      const email = getCurrentUserEmail()
+      if (!email) return { success: false, error: 'Not logged in' }
+
+      const settings = loadSettings(email)
+      if (!settings?.syncFolder) return { success: false, error: 'Sync folder not configured' }
+
+      const folderPath = join(settings.syncFolder, folderTitle)
+      const err = await shell.openPath(folderPath)
+      if (err) throw new Error(err)
+
+      return { success: true }
     } catch (err) {
       return { success: false, error: err.message }
     }
